@@ -1,0 +1,18 @@
+{% load static %}
+<!doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="{% static 'dm/semantic.min.css' %}">
+		<script type="text/javascript" src="{% static 'dm/jquery-3.3.1.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'dm/semantic.min.js' %}"></script>
+		{% block head %}
+		{% endblock %}
+	<body>
+		<div class="ui container">
+			{% block content %}
+			{% endblock %}
+		</div>
+		{% block scripts %}
+		{% endblock %}
+	</body>
+</html>

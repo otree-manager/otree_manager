@@ -1,0 +1,70 @@
+{% extends 'dm/base.html' %}
+{% block head %}
+	<title>App Creation</title>
+	<style type="text/css">
+		#app_name {
+			width: 150px; 
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<div class="ui breadcrumb">
+		<i class="right angle icon divider"></i>
+		<a class="section" href="/">Home</a>
+		<i class="right angle icon divider"></i>
+		<div class="section active">New</div>
+	</div>
+	<h1>New</h1>
+	<div class="ui divider"></div>
+	<form method="POST" action="/new">
+		{% csrf_token %}
+		<div class="ui form">
+			<div class="field">
+				<label>Instance name</label>
+				<p><em>Must only contain [a-Z, 0-9].</em></p>
+				<div class="ui input">
+					{{ form.name }}
+				</div>
+			</div>
+			<div class="field">
+				<label>Experimenter</label>
+				<div class="ui input">
+					{{ form.owned_by }}
+				</div>
+			</div>
+			<div class="grouped fields">
+				<label>Plugins</label>
+				<p>Both plugins are required!</p>
+				{% if postgres %}
+				<div class="field">
+					<div class="ui toggle checkbox">
+					  	<input type="checkbox" name="plugins" value="postgres" checked="checked">
+					  	<label>PostgreSQL</label>
+					</div>
+				</div>
+				{% endif %}
+				{% if redis %}
+				<div class="field">
+					<div class="ui toggle checkbox">
+					  	<input type="checkbox" name="plugins" value="redis" checked="checked">
+					  	<label>Redis</label>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+			<button class="ui primary button">
+			    Create
+			</button>
+		</div>
+		
+	</form>
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript">
+		$(".ui.button").on("click", function () {
+			$(this).addClass('loading');
+		});
+	</script>
+{% endblock %}

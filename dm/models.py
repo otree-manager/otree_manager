@@ -1,11 +1,17 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
-class Experimenter(models.Model):
-	is_admin = models.BooleanField(default=False)
-	name = models.CharField(max_length=32)
-
 class oTreeInstance(models.Model):
-	owned_by = models.ForeignKey(Experimenter, on_delete=models.CASCADE)
+	class Meta:
+		permissions = (
+			('can_restart', "Can restart the oTree instance"),
+			('can_delete', "Can delete the oTree instance")
+		)
+
+	owned_by = models.ForeignKey(User, on_delete=models.CASCADE)
 	name = models.CharField(max_length=16)
+
+	def __str__(self):
+		return self.name

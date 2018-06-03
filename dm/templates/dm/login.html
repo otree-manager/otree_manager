@@ -1,0 +1,15 @@
+{% extends 'dm/base.html' %}
+
+{% block content %}
+	<h1>Login</h1>
+	<form method="POST">
+		{% csrf_token %}
+		{{ form.as_p }}
+		{% if next %}
+			<input type="hidden" name="next" value="{{ next }}" />
+		{% else %}
+			<input type="hidden" name="next" value="/" />
+		{% endif %}
+		<button type="submit">Login</button>
+	</form>
+{% endblock %}

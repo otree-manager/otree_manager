@@ -1,7 +1,19 @@
 from django.urls import path
 
+from django.contrib.auth import views as auth_views
+
 from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('new/', views.new, name='new'),
+    path('login/', auth_views.login, { 'template_name': 'dm/login.html' }, name='login'),
+    path('logout/', auth_views.logout, {'template_name': 'dm/logout.html' }, name="logout"),
+ 	# password_change
+ 	# password_change/done
+ 	# password_reset
+ 	# password_reset/done
+ 	# reset/uidb64/<token>
+ 	# reset/done
+    path('detail/<int:instance_id>', views.detail, name='detail')
 ]
