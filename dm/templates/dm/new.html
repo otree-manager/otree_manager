@@ -15,43 +15,60 @@
 		<i class="right angle icon divider"></i>
 		<div class="section active">New</div>
 	</div>
-	<h1>New</h1>
+	<h1>New Instance</h1>
 	<div class="ui divider"></div>
-	<form method="POST" action="/new">
+	<form method="POST" action="/new/">
 		{% csrf_token %}
-		<div class="ui form">
+		<div class="ui error form">
+			{% if form.non_field_errors %}
+				<div class="ui error message">
+					{{ form.non_field_errors }}
+				</div>
+			{% endif %}
 			<div class="field">
-				<label>Instance name</label>
-				<p><em>Must only contain [a-Z, 0-9].</em></p>
+				{{ form.name.label_tag }}
 				<div class="ui input">
 					{{ form.name }}
 				</div>
+				<p><em>Must only contain [a-Z, 0-9].</em></p>
+				{% if form.name.errors %}
+				<div class="ui error message">
+					{{ form.name.errors }}
+				</div>
+				{% endif %}
+				
 			</div>
 			<div class="field">
-				<label>Experimenter</label>
-				<div class="ui input">
-					{{ form.owned_by }}
+				{{ form.owned_by.label_tag }}
+				<div class="ui fluid search selection dropdown">
+					<input type="hidden" name="{{ form.owned_by.html_name }}">
+					<i class="dropdown icon"></i>
+					<div class="default text">Experimenters</div>
+					<div class="menu">
+						{% for choice, label in form.fields.owned_by.choices %}
+							{% if choice %}
+								<div class="item" data-value="{{choice}}">{{ label }}</div>
+							{% endif %}
+						{% endfor %}
+					</div>
 				</div>
+				{% if form.owned_by.errors %}
+				<div class="ui error message">
+					{{ form.owned_by.errors }}
+				</div>
+				{% endif %}
 			</div>
 			<div class="grouped fields">
 				<label>Plugins</label>
-				<p>Both plugins are required!</p>
-				{% if postgres %}
-				<div class="field">
-					<div class="ui toggle checkbox">
-					  	<input type="checkbox" name="plugins" value="postgres" checked="checked">
-					  	<label>PostgreSQL</label>
+				<p><em>Both plugins are required for oTree production instances!</em></p>
+				{% for plugin in form.enabled_plugins %}
+					<div class="field">
+						<div class="ui toggle checkbox">
+						 	{{ plugin.tag }}
+							<label>{{ plugin.choice_label }}</label>
+						</div>
 					</div>
-				</div>
-				{% endif %}
-				{% if redis %}
-				<div class="field">
-					<div class="ui toggle checkbox">
-					  	<input type="checkbox" name="plugins" value="redis" checked="checked">
-					  	<label>Redis</label>
-					</div>
-				</div>
-				{% endif %}
+				{% endfor %}
 			</div>
 			<button class="ui primary button">
 			    Create
@@ -66,5 +83,6 @@
 		$(".ui.button").on("click", function () {
 			$(this).addClass('loading');
 		});
+		$('.ui.dropdown').dropdown({ 'fullTextSearch': 'exact'});
 	</script>
 {% endblock %}
