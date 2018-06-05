@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('new/', views.new, name='new'),
+    path('delete/<int:instance_id>', views.delete, name='delete'),
     path('login/', auth_views.login, { 'template_name': 'dm/login.html' }, name='login'),
     path('logout/', auth_views.logout, {'template_name': 'dm/logout.html' }, name="logout"),
  	# password_change

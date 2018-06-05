@@ -38,7 +38,7 @@ def new(request):
 			new_instance = form.save()
 			return HttpResponseRedirect('/')
 	else:
-		form = AddNewForm()
+		form = AddNewForm(initial = {'enabled_plugins': [1, 2] })
 	return render(request, 'dm/new.html', {'form': form})
 
 @login_required
@@ -49,8 +49,21 @@ def detail(request, instance_id=None):
 	else:
 		inst = oTreeInstance.objects.get(id=instance_id)
 		perms = get_permissions(request.user, inst)
-		print(perms)
 		if not perms['can_view']:
 			return HttpResponseRedirect('/')
 
 		return render(request, 'dm/detail.html', {'instance': inst, 'permissions': perms })
+
+@login_required
+def delete(request, instance_id=None):
+	if instance_id == None:
+		return HttpResponseRedirect('/')
+
+	else:
+		inst = oTreeInstance.objects.get(id=instance_id)
+		perms = get_permissions(request.user, inst)
+		if not perms['can_delete']:
+			return HttpResponseRedirect('/')
+
+		num_delete, _ = inst.delete()
+		return HttpResponseRedirect('/')

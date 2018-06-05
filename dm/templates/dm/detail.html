@@ -22,34 +22,25 @@
 			</tr>
 			<tr>
 				<td>Git Repository URL</td>
-				<td></td>
+				<td>{{ instance.git_url }} </td>
 			</tr>
-		{% if report %}
 			<tr>
 				<td>Deployed</td>
-				<td>true</td>
+				<td>{{ instance.deployed }}</td>
 			</tr>
-			{% for label, value in report %}
-				<tr>
-					<td></td>
-					<td></td>
-				</tr>
-			{% endfor %}
 			<tr>
 				<td>URL</td>
-				<td><a href="#" target="_blank"></td>
+				<td><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
 			</tr>
-		{% else %}
-			<tr>
-				<td>Deployed</td>
-				<td>false</td>
-			</tr>
-		{% endif %}
 		<tr>
 			<td>Plugins</td>
 			<td>
 				<div class="ui list">
-				
+					{% for plugin in instance.enabled_plugins.all %}
+						<div class="item">
+							{{ plugin.verbose_name }}
+						</div>
+					{% endfor %}
 				</div>
 			</td>
 
@@ -95,7 +86,7 @@
 				onApprove: function () {
 					$(".ui.approve.button").addClass('loading');
 					$(".ui.deny.button").addClass("disabled");
-					window.location.href = "/delete/{{ name }}";
+					window.location.href = "/delete/{{ instance.id }}";
 					return false;
 				},
 				closable: false,
