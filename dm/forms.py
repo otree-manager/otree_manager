@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import UsernameField
 
 from django.contrib.auth.models import Group
+from django.utils.crypto import get_random_string
 
 from django.core.mail import send_mail
 
@@ -40,7 +41,7 @@ class Add_User_Form(ModelForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_unusable_password()
+        user.set_password(get_random_string())
         user.save()
 
         if self.cleaned_data.get("role") == 2:
@@ -53,12 +54,4 @@ class Add_User_Form(ModelForm):
 
         if commit:
             user.save()
-            # needs to be advanced to use the custom email classes
-            send_mail(
-                'Account created',
-                'An account has been create for you. Your username is %s' %user.username,
-                'no-reply@example.com',
-                [user.email],
-                fail_silently=False,
-            )
         return user

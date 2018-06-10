@@ -127,7 +127,7 @@ DOKKU_DOMAIN = "localhost"
 
 
 # settings for mail
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 1025
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
-EMAIL_FROM = 'no-reply@example.com'

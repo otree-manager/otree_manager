@@ -17,7 +17,7 @@
 	</div>
 	<h1>New Instance</h1>
 	<div class="ui divider"></div>
-	<form method="POST" action="/new/">
+	<form method="POST" action="/new_app/">
 		{% csrf_token %}
 		<div class="ui error form">
 			{% if form.non_field_errors %}
