@@ -124,3 +124,10 @@ STATIC_URL = '/static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 DOKKU_DOMAIN = "localhost"
+
+
+# settings for mail
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+
+EMAIL_FROM = 'no-reply@example.com'

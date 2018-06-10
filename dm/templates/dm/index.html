@@ -1,7 +1,7 @@
 {% extends 'dm/base.html' %}
 
 {% block head %}
-	<title>Hello from Flask</title>
+	<title>oTree Manager Home</title>
 {% endblock %}
 
 {% block content %}
@@ -12,8 +12,11 @@
 	<h1>oTree Manager</h1>
 	<div class="ui divider"></div>
 	<div>
-		{% if user_can_add_instance %}
-			<a class="ui primary button" href="/new">New Instance</a>
+		{% if perms.can_add_instance %}
+			<a class="ui primary button" href="/new_app">New Instance</a>
+		{% endif %}
+		{% if perms.can_add_user %}
+			<a class="ui primary button" href="/new_user">Add User</a>
 		{% endif %}
 		<a class="ui basic button" href="/logout">Logout</a><br>
 	</div>
@@ -36,12 +39,6 @@
 	<script type="text/javascript">
 		$(".close.icon").click(function(){
 			$(this).parent().hide();
-		});
-		$(".ui.button").on("click", function () {
-			$(this).addClass('loading');
-		});
-		$("a.header").on("click", function () {
-			$(this).children(".inline.mini.loader").addClass('active');
 		});
 	</script>
 {% endblock %}

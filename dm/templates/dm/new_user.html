@@ -1,0 +1,18 @@
+{% extends 'dm/base.html' %}
+
+{% block head %}
+	<title>New User</title>
+{% endblock %}
+
+{% block content %}
+	<h1>New User</h1>
+	<form action="/new_user/" method="post">
+	    {% csrf_token %}
+	    {{ form.as_p }}
+	    <input type="submit" value="Submit" />
+	</form>
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
