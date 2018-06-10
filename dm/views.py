@@ -1,19 +1,26 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Permission
 
 from .models import oTreeInstance
-from .forms import AddNewForm
+from .forms import Add_New_Instance_Form, Add_User_Form
 
 
-def get_permissions(user, instance):
+def get_permissions(user, instance=None):
+	if instance != None:
+		can_view = (instance.owned_by == user) or user.groups.filter(name='Admins').exists()
+	else:
+		can_view = False
+
 	perms = {
-		'can_view': (instance.owned_by == user) or user.groups.filter(name='Admins').exists(),
+		'can_view': can_view,
 		'can_restart': user.has_perm('dm.can_restart'),
 		'can_delete': user.has_perm('dm.can_delete'),
+		'can_add_user': user.has_perm('dm.add_users'),
+		'can_add_instance': user.has_perm('dm.add_otreeinstance')
 	}
 
 	return perms
@@ -25,21 +32,45 @@ def index(request):
 		show_instances = oTreeInstance.objects.order_by('name').all()
 	else:
 		show_instances = oTreeInstance.objects.filter(owned_by=request.user).order_by('name')
-	context = { 'instances': show_instances, 'user_can_add_instance': request.user.has_perm('dm.add_otreeinstance') }
+	perms = get_permissions(request.user)
+	context = { 'instances': show_instances, 'permissions': perms }
 	return render(request, 'dm/index.html', context)
 
 @login_required
 @permission_required('dm.add_otreeinstance', login_url='/login/', raise_exception=True)
-def new(request):
+def new_app(request):
 	if request.method == 'POST':
 		# handle data posted
-		form = AddNewForm(request.POST)
+		form = Add_New_Instance_Form(request.POST)
 		if form.is_valid():
 			new_instance = form.save()
 			return HttpResponseRedirect('/')
 	else:
-		form = AddNewForm(initial = {'enabled_plugins': [1, 2] })
-	return render(request, 'dm/new.html', {'form': form})
+		form = Add_New_Instance_Form(initial = {'enabled_plugins': [1, 2] })
+	return render(request, 'dm/new_app.html', {'form': form})
+
+@login_required
+def change_password(request):
+	return render(request, 'dm/change_password.html', {})
+
+@login_required
+def password_change_done(request):
+	return render(request, 'dm/password_change_done.html', {})
+
+def password_reset(request):
+	return render(request, 'dm/reset_password.html', {})
+
+@login_required
+@permission_required('dm.add_users', login_url='login', raise_exception=True)
+def new_user(request):
+	if request.method == 'POST':
+		form = Add_User_Form(request.POST)
+		if form.is_valid():
+			new_user = form.save()
+			return HttpResponseRedirect('/')
+	else:
+		form = Add_User_Form()
+	return render(request, 'dm/new_user.html', {'form': form})
 
 @login_required
 def detail(request, instance_id=None):

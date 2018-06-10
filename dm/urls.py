@@ -6,7 +6,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('new/', views.new, name='new'),
+    path('new_app/', views.new_app, name='new_app'),
+    path('new_user/', views.new_user, name='new_user'),
     path('delete/<int:instance_id>', views.delete, name='delete'),
     path('login/', auth_views.login, { 'template_name': 'dm/login.html' }, name='login'),
     path('logout/', auth_views.logout, {'template_name': 'dm/logout.html' }, name="logout"),
