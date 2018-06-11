@@ -1,45 +1,41 @@
 {% extends 'dm/base.html' %}
 
 {% block head %}
-	<title>oTree Manager Home</title>
+    <title>oTree Manager Home</title>
 {% endblock %}
 
 {% block content %}
-	<div class="ui breadcrumb">
-		<i class="right angle icon divider"></i>
-		<div class="section active">Home</div>
-	</div>
-	<h1>oTree Manager</h1>
-	<div class="ui divider"></div>
-	<div>
-		{% if perms.can_add_instance %}
-			<a class="ui primary button" href="/new_app">New Instance</a>
-		{% endif %}
-		{% if perms.can_add_user %}
-			<a class="ui primary button" href="/new_user">Add User</a>
-		{% endif %}
-		<a class="ui basic button" href="/password_change">Change Password</a><br>
-		<a class="ui basic button" href="/logout">Logout</a><br>
-	</div>
-	<div class="ui divider"></div>
-	<h2>Active oTree instances</h2>
-	<div class="ui relaxed divided list">
-		{% for instance in instances %}
-			<div class="item">
-				<i class="large middle aligned server icon"></i>
-				<div class="content">
-					<a class="header" href="detail/{{ instance.id }}">{{ instance.name }} <div class="ui inline mini loader"></div></a>
-					<p class="description">assigned to {{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</p>
-				</div>
-			</div>
-		{% endfor %}
-	</div>
+    <h1>oTree Manager</h1>
+    <div class="ui divider"></div>
+    <div>
+        {% if perms.can_add_instance %}
+            <a class="ui primary button" href="/new_app">New Instance</a>
+        {% endif %}
+        {% if perms.can_add_user %}
+            <a class="ui primary button" href="/new_user">Add User</a>
+        {% endif %}
+        <a class="ui basic button" href="/password_change">Change Password</a>
+        <a class="ui basic button" href="/logout">Logout</a><br>
+    </div>
+    <div class="ui divider"></div>
+    <h2>Active oTree instances</h2>
+    <div class="ui relaxed divided list">
+        {% for instance in instances %}
+            <div class="item">
+                <i class="large middle aligned server icon"></i>
+                <div class="content">
+                    <a class="header" href="detail/{{ instance.id }}">{{ instance.name }} <div class="ui inline mini loader"></div></a>
+                    <p class="description">assigned to {{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
 
 {% block scripts %}
-	<script type="text/javascript">
-		$(".close.icon").click(function(){
-			$(this).parent().hide();
-		});
-	</script>
+    <script type="text/javascript">
+        $(".close.icon").click(function(){
+            $(this).parent().hide();
+        });
+    </script>
 {% endblock %}

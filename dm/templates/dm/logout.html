@@ -1,6 +1,19 @@
 {% extends 'dm/base.html' %}
 
+{% block styles %}
+    <style type="text/css">
+        .ui.container {
+            width: 500px;
+        }
+        .ui.segment {
+            top: 50px;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-	<h1>Logged out</h1>
-	<p>You have been logged out. Feel free to <a href="{% url 'login' %}">login again.</a></p>
+    <div class="ui segment">
+        <h1>Logged out</h1>
+        <p>You have been logged out. Feel free to <a href="{% url 'login' %}">login again.</a></p>
+    </div>
 {% endblock %}
