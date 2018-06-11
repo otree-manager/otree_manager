@@ -41,7 +41,8 @@ class oTreeInstance(models.Model):
 		return self.name
 
 	def git_url(self):
-		return "git url bla"
+		git_url = "dokku@%s:%s" % (settings.DOKKU_DOMAIN, self.name)
+		return git_url
 
 	def url(self):
 		return "http://%s.%s" % (self.name, settings.DOKKU_DOMAIN)

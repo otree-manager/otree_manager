@@ -3,52 +3,69 @@
 	<title>Detail view</title>
 {% endblock%}
 {% block content %}
-	<h1>{{ instance.name }}</h1>
-	<div class="ui divider"></div>
-	<p><b>Status Report</b></p>
-	<table class="ui very basic compact table">
-		<tbody>
-			<tr>
-				<td>Experimenter</td>
-				<td>{{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</td>
-			</tr>
-			<tr>
-				<td>Git Repository URL</td>
-				<td>{{ instance.git_url }} </td>
-			</tr>
-			<tr>
-				<td>Deployed</td>
-				<td>{{ instance.deployed }}</td>
-			</tr>
-			<tr>
-				<td>URL</td>
-				<td><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
-			</tr>
-		<tr>
-			<td>Plugins</td>
-			<td>
-				<div class="ui list">
-					{% for plugin in instance.enabled_plugins.all %}
-						<div class="item">
-							{{ plugin.verbose_name }}
+	<div class="ui segment">
+		<h1>{{ instance.name }}</h1>
+		<p><b>Status Report</b></p>
+		<table class="ui very basic compact table">
+			<tbody>
+				<tr>
+					<td>Experimenter</td>
+					<td>{{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</td>
+				</tr>
+				<tr>
+					<td>Git Repository URL</td>
+					<td>{{ instance.git_url }} </td>
+				</tr>
+				<tr>
+					<td>Deployed</td>
+					<td>{{ instance.deployed }}</td>
+				</tr>
+				<tr>
+					<td>URL</td>
+					<td><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
+				</tr>
+				<tr>
+					<td>Plugins</td>
+					<td>
+						<div class="ui list">
+							{% for plugin in instance.enabled_plugins.all %}
+								<div class="item">
+									{{ plugin.verbose_name }}
+								</div>
+							{% endfor %}
 						</div>
-					{% endfor %}
-				</div>
-			</td>
-
-		</tbody>
-	</table>
-	
-	<div class="ui divider"></div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<a href="{%url 'index' %}" class="ui basic button">Go Back</a>
 		{% if permissions.can_restart %}
-		<a id="restart_button" class="ui basic button">Restart this instance</a> 
+		<a id="restart_button" class="ui orange basic button">Restart Instance</a>
 		{% endif %}
 		{% if permissions.can_delete %}
-		<a id="delete_button" class="ui button negative">Delete this instance</a><br>
+		<a id="delete_button" class="ui button negative">Delete Instance</a>
 		{% endif %}
 	</div>
-
-	<div class="ui basic modal">
+	<div class="ui basic modal" id="restart_modal">
+		<div class="ui icon header">
+			<i class="redo alternate icon"></i>
+			Restart oTree Instance
+		</div>
+		<div class="content">
+			<p style="text-align: center;">Are you sure you want to restart this instance?</p>
+		</div>
+		<div class="actions">
+			<div class="ui red inverted deny button">
+				<i class="remove icon"></i>
+				No
+			</div>
+			<div class="ui inverted basic approve button">
+				<i class="checkmark icon"></i>
+				Yes
+			</div>
+		</div>
+	</div>
+	<div class="ui basic modal" id="delete_modal">
 		<div class="ui icon header">
 			<i class="trash icon"></i>
 			Delete oTree Instance
@@ -68,17 +85,29 @@
 		</div>
 	</div>
 {% endblock %}
+
 {%block scripts %}
 	<script type="text/javascript">
 		$(".ui.button.progress").on("click", function () {
 			$(this).addClass('loading');
 		});
 		$("#delete_button").click(function () {
-			$(".ui.modal").modal('setting', {
+			$("#delete_modal").modal('setting', {
 				onApprove: function () {
 					$(".ui.approve.button").addClass('loading');
 					$(".ui.deny.button").addClass("disabled");
 					window.location.href = "/delete/{{ instance.id }}";
+					return false;
+				},
+				closable: false,
+			}).modal('show');
+		});
+		$("#restart_button").click(function () {
+			$("#restart_modal").modal('setting', {
+				onApprove: function () {
+					$(".ui.approve.button").addClass('loading');
+					$(".ui.deny.button").addClass("disabled");
+					window.location.href = "/restart/{{ instance.id }}";
 					return false;
 				},
 				closable: false,
