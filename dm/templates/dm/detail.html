@@ -17,8 +17,20 @@
 					<td>{{ instance.git_url }} </td>
 				</tr>
 				<tr>
+					<td>Git SHA</td>
+					<td>{{ instance.git_sha }}</td>
+				</tr>
+				<tr>
+					<td>App created</td>
+					<td>{{ instance.app_created }}</td>
+				</tr>
+				<tr>
 					<td>Deployed</td>
 					<td>{{ instance.deployed }}</td>
+				</tr>
+				<tr>
+					<td>Deploy Source</td>
+					<td>{{ instance.deploy_source }}</td>
 				</tr>
 				<tr>
 					<td>URL</td>
@@ -39,7 +51,7 @@
 			</tbody>
 		</table>
 		<a href="{%url 'index' %}" class="ui basic button">Go Back</a>
-		{% if permissions.can_restart %}
+		{% if permissions.can_restart and instance.deployed %}
 		<a id="restart_button" class="ui orange basic button">Restart Instance</a>
 		{% endif %}
 		{% if permissions.can_delete %}

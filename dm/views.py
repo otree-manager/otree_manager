@@ -10,6 +10,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from .models import oTreeInstance
 from .forms import Add_New_Instance_Form, Add_User_Form
 
+from .dokku import DokkuManager
 
 def get_permissions(user, instance=None):
     if instance != None:
@@ -46,9 +47,11 @@ def new_app(request):
         form = Add_New_Instance_Form(request.POST)
         if form.is_valid():
             new_instance = form.save()
+            new_instance.create_dokku_app()
             return HttpResponseRedirect('/')
     else:
         form = Add_New_Instance_Form(initial = {'enabled_plugins': [1, 2] })
+
     return render(request, 'dm/new_app.html', {'form': form})
 
 @login_required
@@ -92,6 +95,9 @@ def detail(request, instance_id=None):
         perms = get_permissions(request.user, inst)
         if not perms['can_view']:
             return HttpResponseRedirect('/')
+
+        dm = DokkuManager()
+        dm.update_instance(inst)
 
         return render(request, 'dm/detail.html', {'instance': inst, 'permissions': perms })
 
