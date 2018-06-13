@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Permission
 
 from django.contrib.auth.forms import PasswordResetForm
 
-from .models import oTreeInstance
+from .models import oTreeInstance, User
 from .forms import Add_New_Instance_Form, Add_User_Form
 
 from .dokku import DokkuManager
@@ -36,7 +36,7 @@ def index(request):
     else:
         show_instances = oTreeInstance.objects.filter(owned_by=request.user).order_by('name')
     perms = get_permissions(request.user)
-    context = { 'instances': show_instances, 'permissions': perms }
+    context = { 'instances': show_instances, 'permissions': perms, 'user': request.user }
     return render(request, 'dm/index.html', context)
 
 @login_required

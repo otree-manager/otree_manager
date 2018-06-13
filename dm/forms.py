@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 
 from django.core.mail import send_mail
 
-from .models import oTreeInstance
+from .models import oTreeInstance, User
 from .choices import *
 
 UserModel = get_user_model()
@@ -15,8 +15,7 @@ UserModel = get_user_model()
 class Add_New_Instance_Form(ModelForm):
     class Meta:
         model = oTreeInstance
-        fields = ['name', 'owned_by', 'enabled_plugins']
-        widgets = {'enabled_plugins': CheckboxSelectMultiple }
+        fields = ['name', 'owned_by']
 
 class Add_User_Form(ModelForm):
     """

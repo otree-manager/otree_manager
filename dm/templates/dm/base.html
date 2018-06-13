@@ -5,6 +5,22 @@
         <link rel="stylesheet" type="text/css" href="{% static 'dm/semantic.min.css' %}">
         <script type="text/javascript" src="{% static 'dm/jquery-3.3.1.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'dm/semantic.min.js' %}"></script>
+        <script type="text/javascript" src="{% static "channels/js/websocketbridge.js" %}"></script>
+        <script type="text/javascript">
+
+            // websockets
+            const wsBridge = new channels.WebSocketBridge();
+            wsBridge.connect('/ws/');
+
+            wsBridge.listen(function(action, stream) {
+              console.log(action, stream);
+            });
+
+            wsBridge.socket.addEventListener('open', function() {
+                console.log("Connected to WebSocket");
+                wsBridge.send({'action':'bla', 'message':'yay'})
+            });
+        </script>
         <style type="text/css">
             .ui.container {
                 margin-top: 50px;

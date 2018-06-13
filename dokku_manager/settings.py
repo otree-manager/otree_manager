@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'dm.apps.DmConfig',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -114,6 +115,18 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Channels
+ASGI_APPLICATION = "dokku_manager.routing.application"
+
+# channels redis
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -131,3 +144,5 @@ DOKKU_DOMAIN = "localhost"
 # EMAIL_PORT = 1025
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
+# Custom User Model
+AUTH_USER_MODEL = 'dm.User'

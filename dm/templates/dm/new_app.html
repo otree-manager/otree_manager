@@ -51,18 +51,6 @@
                     </div>
                     {% endif %}
                 </div>
-                <div class="grouped fields">
-                    <label>Plugins</label>
-                    <p><em>Both plugins are required for oTree production instances!</em></p>
-                    {% for plugin in form.enabled_plugins %}
-                        <div class="field">
-                            <div class="ui toggle checkbox">
-                                {{ plugin.tag }}
-                                <label>{{ plugin.choice_label }}</label>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
                 <button class="ui primary button">
                     Create
                 </button>

@@ -36,18 +36,7 @@
 					<td>URL</td>
 					<td><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
 				</tr>
-				<tr>
-					<td>Plugins</td>
-					<td>
-						<div class="ui list">
-							{% for plugin in instance.enabled_plugins.all %}
-								<div class="item">
-									{{ plugin.verbose_name }}
-								</div>
-							{% endfor %}
-						</div>
-					</td>
-				</tr>
+				
 			</tbody>
 		</table>
 		<a href="{%url 'index' %}" class="ui basic button">Go Back</a>
