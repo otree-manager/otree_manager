@@ -55,6 +55,7 @@ class oTreeInstance(models.Model):
 
     def create_dokku_app(self):
         self.dm.create_app(self)
+        
 
     def create_plugin(self, name):
         if name in PLUGINS:

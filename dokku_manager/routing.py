@@ -11,6 +11,6 @@ application = ProtocolTypeRouter({
         )
     ),
     'channel': ChannelNameRouter({
-        "long_task": dm.consumers.Long_Task,
+        "dokku_tasks": dm.consumers.Dokku_Tasks,
     }),
 })

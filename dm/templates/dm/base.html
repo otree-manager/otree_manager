@@ -2,28 +2,75 @@
 <!doctype html>
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="{% static 'dm/semantic.min.css' %}">
-        <script type="text/javascript" src="{% static 'dm/jquery-3.3.1.min.js' %}"></script>
-        <script type="text/javascript" src="{% static 'dm/semantic.min.js' %}"></script>
-        <script type="text/javascript" src="{% static "channels/js/websocketbridge.js" %}"></script>
-        <script type="text/javascript">
-
+        <link rel='stylesheet' type='text/css' href='{% static 'dm/semantic.min.css' %}'>
+        <script type='text/javascript' src='{% static 'dm/jquery-3.3.1.min.js' %}'></script>
+        <script type='text/javascript' src='{% static 'dm/semantic.min.js' %}'></script>
+        <script type='text/javascript' src='{% static 'channels/js/websocketbridge.js' %}'></script>
+        <script type='text/javascript'>
+            String.prototype.capitalize = function() {
+                return this.charAt(0).toUpperCase() + this.slice(1);
+            }
             // websockets
+            
+            function notify(result, message) {
+                console.log(result, message);
+                
+                switch (result) {
+                    case 'success':
+                        type = 'success';
+                        break;
+                    case 'warning':
+                        type = 'warning';
+                        break;
+                    case 'error':
+                        type = 'error';
+                        break;
+                    default:
+                        type = 'info';
+                }
+
+                var type_capitalized = type.capitalize();
+
+                var notification_id = 'notification_'+Date.now();
+
+                var template = `\
+                <div class='ui ${type} message' id='${notification_id}'>\
+                    <i class='close icon'></i>\
+                    <div class='header'>${type_capitalized}</div>\
+                    <p>${message}</p>\
+                </div>`;
+                
+                $("#notifications_container").append(template);
+                window.setTimeout(function () {
+                    $("#"+notification_id).transition('fade');
+                }, 10000);
+            }
+
+
             const wsBridge = new channels.WebSocketBridge();
             wsBridge.connect('/ws/');
 
-            wsBridge.listen(function(action, stream) {
-              console.log(action, stream);
+            wsBridge.listen(function(data, stream) {
+                // console.log(data, stream);
+                if (data['kind'] == 'notification') {
+                    notify(data['result'], data['message']);
+                }
             });
 
             wsBridge.socket.addEventListener('open', function() {
-                console.log("Connected to WebSocket");
-                wsBridge.send({'action':'bla', 'message':'yay'})
+                console.log('Connected to WebSocket');
             });
         </script>
-        <style type="text/css">
+        <style type='text/css'>
             .ui.container {
                 margin-top: 50px;
+            }
+            #notifications_container {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                width: 80%;
+                transform: translate(-50%, 0%);
             }
         </style>
         {% block styles %}
@@ -32,11 +79,24 @@
         {% block head %}
         {% endblock %}
     <body>
-        <div class="ui container">
+        <div class='ui container'>
             {% block content %}
             {% endblock %}
+            <div id='notifications_container'>
+            
+            </div>
         </div>
+        <script type='text/javascript'>
+            $('.message .close').on('click', function() {
+                $(this).closest('.message').transition('fade');
+            });
+            //$('#notification_success').hide();
+            //$('#notification_info').hide();
+            //$('#notification_warning').hide();
+            //$('#notification_error').hide();
+        </script>
         {% block scripts %}
         {% endblock %}
+
     </body>
 </html>

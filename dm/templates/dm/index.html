@@ -16,6 +16,7 @@
         {% endif %}
         <a class="ui basic button" href="/password_change">Change Password</a>
         <a class="ui basic button" href="/logout">Logout</a><br>
+        <a class="ui orange basic button" href="#" id="long_task">RunTask</a>
     </div>
     <div class="ui divider"></div>
     <h2>Active oTree instances</h2>
@@ -36,6 +37,11 @@
     <script type="text/javascript">
         $(".close.icon").click(function(){
             $(this).parent().hide();
+        });
+
+        $('#long_task').click(function() {
+            wsBridge.send({'action':'run', 'message':'long_task'});
+            console.log('action: run, message: long_task');
         });
     </script>
 {% endblock %}
