@@ -52,13 +52,12 @@ def new_app(request):
         form = Add_New_Instance_Form(request.POST)
         if form.is_valid():
             new_instance = form.save()
-            print(request.user.id, new_instance.id)
             async_to_sync(channel_layer.send)(
                 "dokku_tasks",
                 {
                     "type": "create.app",
                     "user_id": request.user.id,
-                    "instance_id": new_instance.id
+                    "instance_name": new_instance.name
                 },
             )
             return HttpResponseRedirect('/')
@@ -109,8 +108,14 @@ def detail(request, instance_id=None):
         if not perms['can_view']:
             return HttpResponseRedirect('/')
 
-        dm = DokkuManager()
-        dm.update_instance(inst)
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "update.app.report",
+                "user_id": request.user.id,
+                "instance_name": inst.name
+            },
+        )
 
         return render(request, 'dm/detail.html', {'instance': inst, 'permissions': perms })
 
@@ -124,6 +129,15 @@ def delete(request, instance_id=None):
         perms = get_permissions(request.user, inst)
         if not perms['can_delete']:
             return HttpResponseRedirect('/')
-
+        print('try destroy')
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "destroy.app",
+                "user_id": request.user.id,
+                "instance_name": inst.name
+            },
+        )
         num_delete, _ = inst.delete()
+        
         return HttpResponseRedirect('/')
