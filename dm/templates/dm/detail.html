@@ -14,11 +14,11 @@
 				</tr>
 				<tr>
 					<td>Git Repository URL</td>
-					<td>{{ instance.git_url }} </td>
+					<td id="git_url">{{ instance.git_url }} </td>
 				</tr>
 				<tr>
 					<td>Git SHA</td>
-					<td>{{ instance.git_sha }}</td>
+					<td id="git_sha">{{ instance.git_sha }}</td>
 				</tr>
 				<tr>
 					<td>App created</td>
@@ -26,25 +26,29 @@
 				</tr>
 				<tr>
 					<td>Deployed</td>
-					<td>{{ instance.deployed }}</td>
+					<td id="deployed">{{ instance.deployed }}</td>
 				</tr>
 				<tr>
 					<td>Deploy Source</td>
-					<td>{{ instance.deploy_source }}</td>
+					<td id="deploy_source">{{ instance.deploy_source }}</td>
 				</tr>
 				<tr>
 					<td>URL</td>
-					<td><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
+					<td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
 				</tr>
 				
 			</tbody>
 		</table>
 		<a href="{%url 'index' %}" class="ui basic button">Go Back</a>
-		{% if permissions.can_restart and instance.deployed %}
-		<a id="restart_button" class="ui orange basic button">Restart Instance</a>
+		{% if permissions.can_restart %}
+			{% if permissions.deployed %}
+				<a id="restart_button" class="ui orange basic button">Restart Instance</a>
+			{% else %}
+				<a id="restart_button" class="ui orange basic button hidden">Restart Instance</a>
+			{% endif %}
 		{% endif %}
 		{% if permissions.can_delete %}
-		<a id="delete_button" class="ui button negative">Delete Instance</a>
+			<a id="delete_button" class="ui button negative">Delete Instance</a>
 		{% endif %}
 	</div>
 	<div class="ui basic modal" id="restart_modal">
@@ -114,5 +118,14 @@
 				closable: false,
 			}).modal('show');
 		});
+		function handle_ws_data(data, stream) {
+			console.log(data);
+			if (data["kind"] == "report") {
+				var report_dict = data["report"];
+				for (var key in report_dict) {
+					$("#"+key).html(report_dict[key]);
+				}
+			}
+		}
 	</script>
 {% endblock %}

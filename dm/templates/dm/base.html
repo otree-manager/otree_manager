@@ -54,6 +54,10 @@
                 // console.log(data, stream);
                 if (data['kind'] == 'notification') {
                     notify(data['result'], data['message']);
+                } else {
+                    if (typeof handle_ws_data === "function") {
+                        handle_ws_data(data, stream);
+                    }
                 }
             });
 
@@ -71,6 +75,9 @@
                 left: 50%;
                 width: 80%;
                 transform: translate(-50%, 0%);
+            }
+            .hidden {
+                visibility: hidden;
             }
         </style>
         {% block styles %}

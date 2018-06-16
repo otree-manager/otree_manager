@@ -108,6 +108,8 @@ class Dokku_Tasks(SyncConsumer):
         otree_instance.app_dir = report_dict['app_dir']
         otree_instance.save()
 
+        time.sleep(2)
+
         self._push_report(event["user_id"], report_dict)
 
 
