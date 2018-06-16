@@ -24,15 +24,6 @@ class Notifications(WebsocketConsumer):
         action = text_data_json['action']
         message = text_data_json['message']
 
-        #if action == 'run' and message == "long_task":
-        #    async_to_sync(self.channel_layer.send)(
-        #        "long_task",
-        #        {
-        #            "type": "test.print",
-        #            "user_id": self.scope["user"].id,
-        #        },
-        #    )
-
     def ws_forward(self, event):
         """Forwards a message from a background task (channel layer) to the user through websocket"""
         self.send(json.dumps(event))
@@ -45,18 +36,12 @@ class Dokku_Tasks(SyncConsumer):
 
         proc = subprocess.run(['dokku', '--quiet', 'apps:create', event["instance_name"]])
         if proc.returncode != 0:
-            result = 'error'
-            message = "An error occured while creating %s." % event["instance_name"]
-            
             # notify user of error then return
-            self._notify_user(event["user_id"], result, message)
+            self._notify_user(event, "create_app", proc.returncode)
             return False
 
         # success
-        result = 'success'
-        message = "App %s was created successfully. <br/>Databases will now be created and linked." % event["instance_name"]
-
-        self._notify_user(event["user_id"], result, message)
+        self._notify_user(event, "create_app", proc.returncode)
 
         # create plugins
         async_to_sync(self.channel_layer.send)("dokku_tasks", {
@@ -118,17 +103,12 @@ class Dokku_Tasks(SyncConsumer):
         print('received destroy app task')
         proc = subprocess.run(['dokku', '--quiet', '--force', 'apps:destroy', event["instance_name"]])
         if proc.returncode != 0:
-            result = 'error'
-            message = "An error occured while deleting %s." % event["instance_name"]
             # notify user of error then return
-            self._notify_user(event["user_id"], result, message)
+            self._notify_user(event, "destroy_app", proc.returncode)
             return False
 
         # success
-        result = 'success'
-        message = "App %s was destroyed successfully. <br/>Databases will now be removed." % event["instance_name"]
-
-        self._notify_user(event["user_id"], result, message)
+        self._notify_user(event, "destroy_app", proc.returncode)
 
         # destroy plugins
         async_to_sync(self.channel_layer.send)("dokku_tasks", {
@@ -156,11 +136,8 @@ class Dokku_Tasks(SyncConsumer):
 
         proc = subprocess.run(['dokku', '--quiet', cmd, plugin_name])
         if proc.returncode != 0:
-            result = 'error'
-            message = "An error occured while creating plugin %s." % plugin_name
-
             # notify user through websocket
-            self._notify_user(event["user_id"], result, message)
+            self._notify_user(event, "create_plugin", proc.returncode)
             return False
 
         # if created successfully, we link it
@@ -182,15 +159,9 @@ class Dokku_Tasks(SyncConsumer):
         plugin_name = "%s_%s" % (event["instance_name"], event["plugin_name"])
 
         proc = subprocess.run(['dokku', '--quiet', cmd, plugin_name, event["instance_name"]])
-        if proc.returncode == 0:
-            result = 'success'
-            message = "Plugin %s has been created and linked to %s successfully." % (plugin_name, event["instance_name"])
-        else:
-            result = 'error'
-            message = "An error occured while linking plugin %s to %s." % (plugin_name, event["instance_name"])
-
+        
         # notify user through websocket
-        self._notify_user(event["user_id"], result, message)
+        self._notify_user(event, "link_plugin", proc.returncode)
 
 
     def destroy_plugin(self, event):
@@ -203,21 +174,27 @@ class Dokku_Tasks(SyncConsumer):
         plugin_name = "%s_%s" % (event["instance_name"], event["plugin_name"])
 
         proc = subprocess.run(['dokku', '--quiet', '--force', cmd, plugin_name])
-        if proc.returncode == 0:
-            result = 'success'
-            message = "Plugin %s has been destroyed successfully." % plugin_name
-        else:
-            result = 'error'
-            message = "An error occured while destroying plugin %s." % plugin_name
 
         # notify user through websocket
-        self._notify_user(event["user_id"], result, message)
+        self._notify_user(event, 'destroy_plugin', proc.returncode)
 
 
+    def set_env(self, event):
+        cmd = ['dokku', '--quiet', 'config:set', event["instance_name"]]
+    
+        for key, value in event["var_dict"].items():
+            cmd.append('%s=%s' % (key, value))
 
-    def _notify_user(self, user_id, result, message):
+        proc = subprocess.run(cmd, stdout=subprocess.PIPE)
+                
+        # notify user through websocket
+        self._notify_user(event, 'set_env', proc.returncode)
+
+
+    def _notify_user(self, event, situation, returncode):
         #print(user_id, result, message)
-        user = User.objects.get(id=user_id)
+        result, message = self._get_message(event, situation, returncode)
+        user = User.objects.get(id=event["user_id"])
         async_to_sync(self.channel_layer.send)(user.ws_channel, {
             'type': 'ws.forward', 
             'kind': 'notification', 
@@ -233,3 +210,45 @@ class Dokku_Tasks(SyncConsumer):
             'kind': 'report', 
             'report': report_dict
         })
+
+    def _get_message(self, event, situation, returncode):
+        result = "success" if returncode == 0 else "error"
+
+        message_dict = {
+            "success": {
+                "set_env": "Environment variables have been set for {}.",
+                "link_plugin": "Plugin {} has been created and linked to {} successfully.",
+                "destroy_plugin": "Plugin {} has been destroyed successfully.",
+                "create_plugin": "",
+                "create_app": "App {} was created successfully. <br/>Databases will now be created and linked.",
+                "destroy_app": "App {} was destroyed successfully. <br/>Databases will now be removed.",
+            },
+            "warning": {
+
+            },
+            "error": {
+                "set_env": "An error occured while setting environment variables for {}.",
+                "link_plugin": "An error occured while linking plugin {} to {}.",
+                "destroy_plugin": "An error occured while destroying plugin {}.",
+                "create_plugin": "An error occured while creating plugin {}.",
+                "create_app": "An error occured while creating {}.",
+                "destroy_app": "An error occured while deleting {}.",
+            },
+            "info" : {
+
+            }
+        }
+
+        string_input_dict = {
+            "set_env": event["instance_name"],
+            "link_plugin": (event.get("plugin_name", ''), event["instance_name"]),
+            "destroy_plugin": event.get("plugin_name", ''),
+            "create_plugin": event.get("plugin_name", ''),
+            "create_app": event["instance_name"],
+            "destroy_app": event["instance_name"],
+        }
+
+
+
+        message_template = message_dict[result][situation]
+        return result, message_template.format(*string_input_dict[situation])

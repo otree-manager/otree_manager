@@ -5,7 +5,10 @@ from django.conf import settings
 
 from .choices import *
 
-from .dokku import DokkuManager
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+channel_layer = get_channel_layer()
 
 
 class User(AbstractUser):
@@ -20,8 +23,6 @@ class oTreeInstance(models.Model):
             ('can_restart', "Can restart the oTree instance"),
             ('can_delete', "Can delete the oTree instance")
         )
-
-    dm = DokkuManager()
 
     name = models.CharField(
         max_length=32, 
@@ -38,7 +39,6 @@ class oTreeInstance(models.Model):
     deploy_source = models.CharField(max_length=200, blank=True)
     app_dir = models.CharField(max_length=200, blank=True)
 
-    app_created = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -50,21 +50,37 @@ class oTreeInstance(models.Model):
     def url(self):
         return "http://%s.%s" % (self.name, settings.DOKKU_DOMAIN)
 
-    def refresh_from_dokku(self):
-        self.dm.update_instance(self)
+    def refresh_from_dokku(self, user_id):
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "update.app.report",
+                "user_id": user_id,
+                "instance_name": self.name
+            },
+        )
 
-    def create_dokku_app(self):
-        self.dm.create_app(self)
+    def create_dokku_app(self, user_id):
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "create.app",
+                "user_id": user_id,
+                "instance_name": self.name
+            },
+        )
+
+    def destroy_dokku_app(self, user_id, delete_self=True):
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "destroy.app",
+                "user_id": user_id,
+                "instance_name": self.name
+            },
+        )
+        num_delete, _ = self.delete()
         
-
-    def create_plugin(self, name):
-        if name in PLUGINS:
-            self.dm.create_plugin(name, self)
-
-    def link_plugin(self, name):
-        if name in PLUGINS:
-            self.dm.link_plugin(name, self)
-
 
 
 

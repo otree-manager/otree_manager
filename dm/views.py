@@ -12,11 +12,6 @@ from .forms import Add_New_Instance_Form, Add_User_Form
 
 from .dokku import DokkuManager
 
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
-channel_layer = get_channel_layer()
-
 def get_permissions(user, instance=None):
     if instance != None:
         can_view = (instance.owned_by == user) or user.groups.filter(name='Admins').exists()
@@ -52,14 +47,7 @@ def new_app(request):
         form = Add_New_Instance_Form(request.POST)
         if form.is_valid():
             new_instance = form.save()
-            async_to_sync(channel_layer.send)(
-                "dokku_tasks",
-                {
-                    "type": "create.app",
-                    "user_id": request.user.id,
-                    "instance_name": new_instance.name
-                },
-            )
+            new_instance.create_dokku_app(request.user.id)
             return HttpResponseRedirect('/')
     else:
         form = Add_New_Instance_Form(initial = {'enabled_plugins': [1, 2] })
@@ -108,14 +96,7 @@ def detail(request, instance_id=None):
         if not perms['can_view']:
             return HttpResponseRedirect('/')
 
-        async_to_sync(channel_layer.send)(
-            "dokku_tasks",
-            {
-                "type": "update.app.report",
-                "user_id": request.user.id,
-                "instance_name": inst.name
-            },
-        )
+        inst.refresh_from_dokku(request.user.id)
 
         return render(request, 'dm/detail.html', {'instance': inst, 'permissions': perms })
 
@@ -130,14 +111,6 @@ def delete(request, instance_id=None):
         if not perms['can_delete']:
             return HttpResponseRedirect('/')
         print('try destroy')
-        async_to_sync(channel_layer.send)(
-            "dokku_tasks",
-            {
-                "type": "destroy.app",
-                "user_id": request.user.id,
-                "instance_name": inst.name
-            },
-        )
-        num_delete, _ = inst.delete()
+        inst.destroy_dokku_app(request.user.id)
         
         return HttpResponseRedirect('/')

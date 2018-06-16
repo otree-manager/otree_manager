@@ -21,10 +21,6 @@
 					<td id="git_sha">{{ instance.git_sha }}</td>
 				</tr>
 				<tr>
-					<td>App created</td>
-					<td>{{ instance.app_created }}</td>
-				</tr>
-				<tr>
 					<td>Deployed</td>
 					<td id="deployed">{{ instance.deployed }}</td>
 				</tr>
@@ -39,17 +35,19 @@
 				
 			</tbody>
 		</table>
-		<a href="{%url 'index' %}" class="ui basic button">Go Back</a>
-		{% if permissions.can_restart %}
-			{% if permissions.deployed %}
+		<div>
+			<span id="back_button_span"><a href="{%url 'index' %}" class="ui basic button">Go Back</a></span>
+			<span id="restart_button_span">
+			{% if permissions.can_restart and instance.deployed %}
 				<a id="restart_button" class="ui orange basic button">Restart Instance</a>
-			{% else %}
-				<a id="restart_button" class="ui orange basic button hidden">Restart Instance</a>
 			{% endif %}
-		{% endif %}
-		{% if permissions.can_delete %}
-			<a id="delete_button" class="ui button negative">Delete Instance</a>
-		{% endif %}
+			</span>
+			<span id="delete_button_span">
+			{% if permissions.can_delete %}
+				<a id="delete_button" class="ui button negative">Delete Instance</a>
+			{% endif %}
+			</span>
+		</div>
 	</div>
 	<div class="ui basic modal" id="restart_modal">
 		<div class="ui icon header">
@@ -124,6 +122,9 @@
 				var report_dict = data["report"];
 				for (var key in report_dict) {
 					$("#"+key).html(report_dict[key]);
+				}
+				if (report_dict['deployed'] == true) {
+					$("#restart_button_span").html("<a id='restart_button' class='ui orange basic button'>Restart Instance</a>");
 				}
 			}
 		}
