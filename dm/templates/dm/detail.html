@@ -32,11 +32,29 @@
 					<td>URL</td>
 					<td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
 				</tr>
-				
+				<tr>
+					<td>oTree Admin Username</td>
+					<td id="admin_username">{{ instance.otree_admin_username }}</td>
+				</tr>
+				<tr>
+					<td>oTree Admin Password</td>
+					<td id="admin_password">{{ instance.otree_admin_password }}</td>
+				</tr>
+				<tr>
+					<td>oTree Auth Level</td>
+					<td id="auth_level">{{ instance.otree_auth_level }}</td>
+				</tr>
+				<tr>
+					<td>oTree Production</td>
+					<td id="otree_production">{{ instance.otree_production }}</td>
+				</tr>
 			</tbody>
 		</table>
 		<div>
 			<span id="back_button_span"><a href="{%url 'index' %}" class="ui basic button">Go Back</a></span>
+			<span id="reset_password_button">
+				<a href="{% url 'reset_otree_password' instance_id=instance.id %}" class="ui basic blue button">Reset Admin Password</a>
+			</span>
 			<span id="restart_button_span">
 			{% if permissions.can_restart and instance.deployed %}
 				<a id="restart_button" class="ui orange basic button">Restart Instance</a>

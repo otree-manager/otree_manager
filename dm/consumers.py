@@ -93,10 +93,10 @@ class Dokku_Tasks(SyncConsumer):
         otree_instance.app_dir = report_dict['app_dir']
         otree_instance.save()
 
-        time.sleep(2)
+        # remove later
+        time.sleep(1)
 
         self._push_report(event["user_id"], report_dict)
-
 
 
     def destroy_app(self, event):
@@ -185,6 +185,8 @@ class Dokku_Tasks(SyncConsumer):
         for key, value in event["var_dict"].items():
             cmd.append('%s=%s' % (key, value))
 
+        print(cmd)
+
         proc = subprocess.run(cmd, stdout=subprocess.PIPE)
                 
         # notify user through websocket
@@ -240,12 +242,12 @@ class Dokku_Tasks(SyncConsumer):
         }
 
         string_input_dict = {
-            "set_env": event["instance_name"],
+            "set_env": (event["instance_name"], ),
             "link_plugin": (event.get("plugin_name", ''), event["instance_name"]),
-            "destroy_plugin": event.get("plugin_name", ''),
-            "create_plugin": event.get("plugin_name", ''),
-            "create_app": event["instance_name"],
-            "destroy_app": event["instance_name"],
+            "destroy_plugin": (event.get("plugin_name", ''),),
+            "create_plugin": (event.get("plugin_name", ''),),
+            "create_app": (event["instance_name"],),
+            "destroy_app": (event["instance_name"],),
         }
 
 

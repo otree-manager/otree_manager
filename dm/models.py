@@ -8,6 +8,9 @@ from .choices import *
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+import string
+import random
+
 channel_layer = get_channel_layer()
 
 
@@ -39,6 +42,10 @@ class oTreeInstance(models.Model):
     deploy_source = models.CharField(max_length=200, blank=True)
     app_dir = models.CharField(max_length=200, blank=True)
 
+    otree_admin_username = models.CharField(max_length=200, blank=True)
+    otree_admin_password = models.CharField(max_length=200, blank=True)
+    otree_auth_level = models.CharField(max_length=200, blank=True)
+    otree_production = models.SmallIntegerField(blank=True)
 
     def __str__(self):
         return self.name
@@ -81,7 +88,31 @@ class oTreeInstance(models.Model):
         )
         num_delete, _ = self.delete()
         
+    def set_default_environment(self, user_id):
+        self.otree_production = 1
+        self.otree_admin_username = "admin"
+        self.otree_admin_password = self._get_random_password()
+        self.otree_auth_level = "STUDY"
+        self.save()
 
+        print(self.otree_admin_password)
 
+        env_vars_dict = {
+            'OTREE_PRODUCTION': self.otree_production,
+            'OTREE_ADMIN_USERNAME': self.otree_admin_username,
+            'OTREE_ADMIN_PASSWORD': self.otree_admin_password,
+            'OTREE_AUTH_LEVEL': self.otree_auth_level
+        }
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "set.env",
+                "user_id": user_id,
+                "instance_name": self.name,
+                "var_dict": env_vars_dict
+            },
+        )        
 
         
+    def _get_random_password(self, length=20, chars=string.ascii_letters + string.digits):
+        return "".join(random.choice(chars) for i in range(length))

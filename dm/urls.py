@@ -26,5 +26,7 @@ urlpatterns = [
 
     path('new_app/', views.new_app, name='new_app'),
     path('delete/<int:instance_id>', views.delete, name='delete'),
-    path('detail/<int:instance_id>', views.detail, name='detail')
+    path('detail/<int:instance_id>', views.detail, name='detail'),
+
+    path('reset_otree_password/<int:instance_id>', views.reset_otree_password, name="reset_otree_password"),
 ]
