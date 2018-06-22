@@ -29,4 +29,5 @@ urlpatterns = [
     path('detail/<int:instance_id>', views.detail, name='detail'),
 
     path('reset_otree_password/<int:instance_id>', views.reset_otree_password, name="reset_otree_password"),
+    path('change_otree_password/<int:instance_id>', views.change_otree_password, name="change_otree_password"),
 ]

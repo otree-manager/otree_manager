@@ -9,7 +9,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.forms import PasswordResetForm
 
 from .models import oTreeInstance, User
-from .forms import Add_New_Instance_Form, Add_User_Form
+from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password
 
 from .dokku import DokkuManager
 
@@ -67,9 +67,22 @@ def change_password(request):
 def password_change_done(request):
     return render(request, 'dm/password_change_done.html', {})
 
+
 def password_reset(request):
     return render(request, 'dm/reset_password.html', {})
 
+
+@login_required
+def change_otree_password(request, instance_id):
+    if request.method == 'POST':
+        form = Change_OTree_Password(post_data=request.POST, instance_id=instance_id)
+        if form.is_valid():
+            user = form.save()
+            return HttpResponseRedirect('/')
+    else:
+        form = Change_OTree_Password(instance_id=instance_id)
+
+    return render(request, 'dm/change_otree_password.html', {'form': form})
 
 @login_required
 @permission_required('dm.add_users', login_url='login', raise_exception=True)

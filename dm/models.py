@@ -95,14 +95,18 @@ class oTreeInstance(models.Model):
         self.otree_auth_level = "STUDY"
         self.save()
 
-        print(self.otree_admin_password)
+        self.set_environment(user_id)       
 
+
+    def set_environment(self, user_id=-1):
+        print('set env')
         env_vars_dict = {
             'OTREE_PRODUCTION': self.otree_production,
             'OTREE_ADMIN_USERNAME': self.otree_admin_username,
             'OTREE_ADMIN_PASSWORD': self.otree_admin_password,
             'OTREE_AUTH_LEVEL': self.otree_auth_level
         }
+
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
             {
@@ -111,8 +115,13 @@ class oTreeInstance(models.Model):
                 "instance_name": self.name,
                 "var_dict": env_vars_dict
             },
-        )        
+        )
 
+
+    def set_otree_password(self, admin_password):
+        self.otree_admin_password = admin_password
+        self.save()
+        self.set_environment()
         
     def _get_random_password(self, length=20, chars=string.ascii_letters + string.digits):
         return "".join(random.choice(chars) for i in range(length))

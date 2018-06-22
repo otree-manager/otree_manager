@@ -195,6 +195,9 @@ class Dokku_Tasks(SyncConsumer):
 
     def _notify_user(self, event, situation, returncode):
         #print(user_id, result, message)
+        if event['user_id'] == -1:
+            return False
+            
         result, message = self._get_message(event, situation, returncode)
         user = User.objects.get(id=event["user_id"])
         async_to_sync(self.channel_layer.send)(user.ws_channel, {
