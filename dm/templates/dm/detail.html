@@ -1,4 +1,4 @@
-{% extends 'dm/base.html' %}
+{% extends 'dm/base_ws.html' %}
 {% block head %}
 	<title>Detail view</title>
 {% endblock%}
@@ -54,6 +54,9 @@
 			<span id="back_button_span"><a href="{%url 'index' %}" class="ui basic button">Go Back</a></span>
 			<span id="change_password_button">
 				<a href="{% url 'change_otree_password' instance_id=instance.id %}" class="ui basic blue button">Change Admin Password</a>
+			</span>
+			<span id="reset_database_button">
+				<a href="{% url 'reset_database' instance_id=instance.id %}" class="ui basic red button">Reset Database</a>
 			</span>
 			<span id="restart_button_span">
 			{% if permissions.can_restart and instance.deployed %}

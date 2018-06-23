@@ -57,6 +57,10 @@ class Dokku_Tasks(SyncConsumer):
             'plugin_name': 'postgres'
         })
 
+        # set default environment
+        inst = oTreeInstance.objects.get(name=event["instance_name"])
+        inst.set_default_environment()
+
 
     def update_app_report(self, event):
         proc = subprocess.run(['dokku', '--quiet', 'apps:report', event["instance_name"]], 
@@ -193,6 +197,18 @@ class Dokku_Tasks(SyncConsumer):
         self._notify_user(event, 'set_env', proc.returncode)
 
 
+    def reset_database(self, event):
+        print('received reset database task')
+        proc = subprocess.run(['dokku', 'run', event["instance_name"], 'otree', 'resetdb', '--noinput'])
+        if proc.returncode != 0:
+            # notify user of error then return
+            self._notify_user(event, "reset_database", proc.returncode)
+            return False
+
+        # success
+        self._notify_user(event, "reset_database", proc.returncode)
+
+
     def _notify_user(self, event, situation, returncode):
         #print(user_id, result, message)
         if event['user_id'] == -1:
@@ -227,6 +243,7 @@ class Dokku_Tasks(SyncConsumer):
                 "create_plugin": "",
                 "create_app": "App {} was created successfully. <br/>Databases will now be created and linked.",
                 "destroy_app": "App {} was destroyed successfully. <br/>Databases will now be removed.",
+                "reset_database": "Database for app {} was reset successfully.",
             },
             "warning": {
 
@@ -238,6 +255,7 @@ class Dokku_Tasks(SyncConsumer):
                 "create_plugin": "An error occured while creating plugin {}.",
                 "create_app": "An error occured while creating {}.",
                 "destroy_app": "An error occured while deleting {}.",
+                "reset_database": "An error occured while resetting database for {}.",
             },
             "info" : {
 
@@ -251,6 +269,7 @@ class Dokku_Tasks(SyncConsumer):
             "create_plugin": (event.get("plugin_name", ''),),
             "create_app": (event["instance_name"],),
             "destroy_app": (event["instance_name"],),
+            "reset_database": (event["instance_name"],),
         }
 
 

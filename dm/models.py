@@ -24,7 +24,7 @@ class oTreeInstance(models.Model):
     class Meta:
         permissions = (
             ('can_restart', "Can restart the oTree instance"),
-            ('can_delete', "Can delete the oTree instance")
+            ('can_reset', "Can reset otree database"),
         )
 
     name = models.CharField(
@@ -45,7 +45,7 @@ class oTreeInstance(models.Model):
     otree_admin_username = models.CharField(max_length=200, blank=True)
     otree_admin_password = models.CharField(max_length=200, blank=True)
     otree_auth_level = models.CharField(max_length=200, blank=True)
-    otree_production = models.SmallIntegerField(blank=True)
+    otree_production = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -55,8 +55,8 @@ class oTreeInstance(models.Model):
         return git_url
 
     def url(self):
-        return "http://%s.%s" % (self.name, settings.DOKKU_DOMAIN)
-
+        return "http://%s.%s" % (self.name, settings.DOKKU_DOMAIN
+)
     def refresh_from_dokku(self, user_id):
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
@@ -88,7 +88,7 @@ class oTreeInstance(models.Model):
         )
         num_delete, _ = self.delete()
         
-    def set_default_environment(self, user_id):
+    def set_default_environment(self, user_id=-1):
         self.otree_production = 1
         self.otree_admin_username = "admin"
         self.otree_admin_password = self._get_random_password()
@@ -114,6 +114,17 @@ class oTreeInstance(models.Model):
                 "user_id": user_id,
                 "instance_name": self.name,
                 "var_dict": env_vars_dict
+            },
+        )
+
+
+    def reset_database(self, user_id):
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "reset.database",
+                "user_id": user_id,
+                "instance_name": self.name
             },
         )
 

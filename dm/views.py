@@ -25,7 +25,8 @@ def get_permissions(user, instance=None):
         'can_restart': user.has_perm('dm.can_restart'),
         'can_delete': user.has_perm('dm.can_delete'),
         'can_add_user': user.has_perm('dm.add_users'),
-        'can_add_instance': user.has_perm('dm.add_otreeinstance')
+        'can_add_instance': user.has_perm('dm.add_otreeinstance'),
+        'can_reset': user.has_perm('dm.can_reset'),
     }
 
     return perms
@@ -152,4 +153,20 @@ def reset_otree_password(request, instance_id=None):
     inst.set_default_environment(request.user.id)
     # do stuff
 
+    return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
+
+
+@login_required
+def reset_database(request, instance_id=None):
+    if instance_id == None:
+        return HttpResponseRedirect('/')
+
+    inst = oTreeInstance.objects.get(id=instance_id)
+    perms = get_permissions(request.user, inst)
+    if not perms['can_reset']:
+        return HttpResponseRedirect('/')
+
+    print('otree database reset')
+
+    inst.reset_database(request.user.id)
     return HttpResponseRedirect(reverse('detail', args=(instance_id,)))

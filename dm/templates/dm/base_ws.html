@@ -1,0 +1,64 @@
+{% extends "dm/base.html" %}
+{% load static %}
+
+{% block ws %}
+    <script type='text/javascript'>
+        String.prototype.capitalize = function() {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        }
+        // websockets
+        
+        function notify(result, message) {
+            console.log(result, message);
+            
+            switch (result) {
+                case 'success':
+                    type = 'success';
+                    break;
+                case 'warning':
+                    type = 'warning';
+                    break;
+                case 'error':
+                    type = 'error';
+                    break;
+                default:
+                    type = 'info';
+            }
+
+            var type_capitalized = type.capitalize();
+
+            var notification_id = 'notification_'+Date.now();
+
+            var template = `\
+            <div class='ui ${type} message' id='${notification_id}'>\
+                <i class='close icon'></i>\
+                <div class='header'>${type_capitalized}</div>\
+                <p>${message}</p>\
+            </div>`;
+            
+            $("#notifications_container").append(template);
+            window.setTimeout(function () {
+                $("#"+notification_id).transition('fade');
+            }, 10000);
+        }
+
+
+        const wsBridge = new channels.WebSocketBridge();
+        wsBridge.connect('/ws/');
+
+        wsBridge.listen(function(data, stream) {
+            // console.log(data, stream);
+            if (data['kind'] == 'notification') {
+                notify(data['result'], data['message']);
+            } else {
+                if (typeof handle_ws_data === "function") {
+                    handle_ws_data(data, stream);
+                }
+            }
+        });
+
+        wsBridge.socket.addEventListener('open', function() {
+            console.log('Connected to WebSocket');
+        });
+    </script>
+{% endblock ws%}
