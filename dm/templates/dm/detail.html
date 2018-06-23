@@ -52,8 +52,8 @@
 		</table>
 		<div>
 			<span id="back_button_span"><a href="{%url 'index' %}" class="ui basic button">Go Back</a></span>
-			<span id="reset_password_button">
-				<a href="{% url 'reset_otree_password' instance_id=instance.id %}" class="ui basic blue button">Reset Admin Password</a>
+			<span id="change_password_button">
+				<a href="{% url 'change_otree_password' instance_id=instance.id %}" class="ui basic blue button">Change Admin Password</a>
 			</span>
 			<span id="restart_button_span">
 			{% if permissions.can_restart and instance.deployed %}

@@ -117,11 +117,6 @@ class oTreeInstance(models.Model):
             },
         )
 
-
-    def set_otree_password(self, admin_password):
-        self.otree_admin_password = admin_password
-        self.save()
-        self.set_environment()
-        
+       
     def _get_random_password(self, length=20, chars=string.ascii_letters + string.digits):
         return "".join(random.choice(chars) for i in range(length))

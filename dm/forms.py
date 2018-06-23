@@ -1,4 +1,4 @@
-from django.forms import ModelForm, CheckboxSelectMultiple, ChoiceField, Form, CharField, PasswordInput, ValidationError
+from django import forms 
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import UsernameField
 
@@ -14,62 +14,52 @@ from .choices import *
 UserModel = get_user_model()
 _ = gettext.gettext
 
-class Add_New_Instance_Form(ModelForm):
+class Add_New_Instance_Form(forms.ModelForm):
     class Meta:
         model = oTreeInstance
         fields = ['name', 'owned_by']
 
 
-class Change_OTree_Password(Form):
-    password_1 = CharField(label="Password", max_length="100", widget=PasswordInput)
-    password_2 = CharField(label="Password confirmation", max_length="100", widget=PasswordInput)
+class Change_OTree_Password(forms.ModelForm):
+
+    password_2 = forms.CharField(label="Password confirmation", max_length="100", widget=forms.PasswordInput())
+
+    class Meta:
+        model = oTreeInstance
+        fields = ['otree_admin_password', 'password_2']
+        widgets = {
+            'otree_admin_password': forms.PasswordInput()
+        }
+
 
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
 
-    def __init__(self, instance_id, post_data=None, *args, **kwargs):
-        self.instance = oTreeInstance.objects.get(id=instance_id)
-        self.cleaned_data = { 'password': None }
-        if post_data:
-            print(post_data)
-            self.password_1 = post_data['password_1']
-            self.password_2 = post_data['password_2']
-
-        super().__init__(*args, **kwargs)
-
     def clean(self):
-        super().clean()
-        if self.password_2_clean():
-            return self.cleaned_data
-        else:
-            raise ValidationError(
-                self.error_messages['password_mismatch'],
-                code='password_mismatch',
-            )
+        cleaned_data = super().clean()
+        password = cleaned_data.get('otree_admin_password')
+        password_2 = cleaned_data.get('password_2')
 
-    def is_valid(self):
-        return self.clean()
+        if password != password_2 or not password or not password_2:
+            raise forms.ValidationError(self.error_messages['password_mismatch'], code="invalid password")
 
-    def password_2_clean(self):
-        if self.password_1 and self.password_2 and self.password_1 == self.password_2:
-            self.cleaned_data["password"] = self.password_1
-            return True
-        else:
-            return False
-
-    def save(self, commit="True"):
-        password = self.cleaned_data.get('password')
-        self.instance.set_otree_password(password)
-        return self.instance
+        return cleaned_data
 
 
-class Add_User_Form(ModelForm):
+    def save(self, commit=True):
+        inst = super().save()
+        inst.set_environment()
+        return inst
+
+
+
+class Add_User_Form(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username
     """
 
-    role = ChoiceField(
+    role = forms.ChoiceField(
         label="Role",
         choices=ROLES,
         initial=1,

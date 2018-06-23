@@ -75,12 +75,16 @@ def password_reset(request):
 @login_required
 def change_otree_password(request, instance_id):
     if request.method == 'POST':
-        form = Change_OTree_Password(post_data=request.POST, instance_id=instance_id)
+        inst = oTreeInstance.objects.get(id=instance_id)
+        form = Change_OTree_Password(request.POST or None, instance = inst)
         if form.is_valid():
             user = form.save()
             return HttpResponseRedirect('/')
+
+        else:
+            form = Change_OTree_Password(request.POST)
     else:
-        form = Change_OTree_Password(instance_id=instance_id)
+        form = Change_OTree_Password()
 
     return render(request, 'dm/change_otree_password.html', {'form': form})
 
