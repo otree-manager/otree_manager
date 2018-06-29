@@ -137,7 +137,12 @@ STATIC_URL = '/static/'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 DOKKU_DOMAIN = "localhost"
+DOKKU_BASE = "/home/dokku"
 
+# scaling
+MIN_WORKERS = 0
+MAX_WORKERS = 4
+MAX_WEB = 4
 
 # settings for mail
 # EMAIL_HOST = 'localhost'
@@ -146,3 +151,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During devel
 
 # Custom User Model
 AUTH_USER_MODEL = 'dm.User'
+

@@ -14,6 +14,8 @@ from .choices import *
 UserModel = get_user_model()
 _ = gettext.gettext
 
+
+
 class Add_New_Instance_Form(forms.ModelForm):
     class Meta:
         model = oTreeInstance
@@ -53,6 +55,16 @@ class Change_OTree_Password(forms.ModelForm):
         return inst
 
 
+class Change_Scaling_Form(forms.ModelForm):
+    class Meta:
+        model = oTreeInstance
+        fields = ['web_dynos', 'worker_dynos']
+
+    def save(self, commit=True):
+        inst = super().save()
+        inst.scale_dokku_app()
+        return inst
+        
 
 class Add_User_Form(forms.ModelForm):
     """

@@ -6,9 +6,12 @@ from asgiref.sync import async_to_sync
 from .models import User, oTreeInstance
 from .choices import PLUGINS
 
+from django.conf import settings
+
 import json
 import time
 import subprocess
+
 
 class Notifications(WebsocketConsumer):
     def connect(self):
@@ -40,6 +43,7 @@ class Dokku_Tasks(SyncConsumer):
             self._notify_user(event, "create_app", proc.returncode)
             return False
 
+
         # success
         self._notify_user(event, "create_app", proc.returncode)
 
@@ -56,10 +60,40 @@ class Dokku_Tasks(SyncConsumer):
             'user_id': event["user_id"],
             'plugin_name': 'postgres'
         })
+        # scale to defaults
+        async_to_sync(self.channel_layer.send)("dokku_tasks", {
+            'type': 'scale_app',
+            'instance_name': event["instance_name"],
+            'user_id': event["user_id"],
+            'var_dict': {
+                'web': '1',
+                'worker': '1',
+            }
+        })
 
         # set default environment
         inst = oTreeInstance.objects.get(name=event["instance_name"])
         inst.set_default_environment()
+
+
+    def scale_app(self, event):
+        print('received scale app task')
+        cmd = ['dokku', '--quiet', 'ps:scale', event["instance_name"]]
+
+        for key, value in event["var_dict"].items():
+            cmd.append('%s=%s' % (key, value))
+
+        print(cmd)
+
+        proc = subprocess.run(cmd)
+        if proc.returncode != 0:
+            # notify user of error then return
+            self._notify_user(event, "scale_app", proc.returncode)
+            return False
+
+
+        # success
+        self._notify_user(event, "scale_app", proc.returncode)
 
 
     def update_app_report(self, event):
@@ -209,6 +243,18 @@ class Dokku_Tasks(SyncConsumer):
         self._notify_user(event, "reset_database", proc.returncode)
 
 
+    def restart_app(self, event):
+        print('received restart task')
+        proc = subprocess.run(['dokku', 'ps:restart', event["instance_name"]])
+        if proc.returncode != 0:
+            # notify user of error then return
+            self._notify_user(event, "restart_app", proc.returncode)
+            return False
+
+        # success
+        self._notify_user(event, "restart_app", proc.returncode)
+
+
     def _notify_user(self, event, situation, returncode):
         #print(user_id, result, message)
         if event['user_id'] == -1:
@@ -223,6 +269,7 @@ class Dokku_Tasks(SyncConsumer):
             'message': message
         })
 
+
     def _push_report(self, user_id, report_dict):
         print(user_id, report_dict)
         user = User.objects.get(id=user_id)
@@ -231,6 +278,7 @@ class Dokku_Tasks(SyncConsumer):
             'kind': 'report', 
             'report': report_dict
         })
+
 
     def _get_message(self, event, situation, returncode):
         result = "success" if returncode == 0 else "error"
@@ -244,6 +292,8 @@ class Dokku_Tasks(SyncConsumer):
                 "create_app": "App {} was created successfully. <br/>Databases will now be created and linked.",
                 "destroy_app": "App {} was destroyed successfully. <br/>Databases will now be removed.",
                 "reset_database": "Database for app {} was reset successfully.",
+                "restart_app": "App {} was restarted successfully.",
+                "scale_app": "Workers for app {} have been adjusted successfully.",
             },
             "warning": {
 
@@ -256,6 +306,8 @@ class Dokku_Tasks(SyncConsumer):
                 "create_app": "An error occured while creating {}.",
                 "destroy_app": "An error occured while deleting {}.",
                 "reset_database": "An error occured while resetting database for {}.",
+                "restart_app": "An error occured while restarting {}.",
+                "scale_app": "Workers for app {} could not be adjusted.",
             },
             "info" : {
 
@@ -270,6 +322,8 @@ class Dokku_Tasks(SyncConsumer):
             "create_app": (event["instance_name"],),
             "destroy_app": (event["instance_name"],),
             "reset_database": (event["instance_name"],),
+            "restart_app": (event["instance_name"],),
+            "scale_app": (event["instance_name"],),
         }
 
 

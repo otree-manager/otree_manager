@@ -9,9 +9,8 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.forms import PasswordResetForm
 
 from .models import oTreeInstance, User
-from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password
+from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password, Change_Scaling_Form
 
-from .dokku import DokkuManager
 
 
 def get_permissions(user, instance=None):
@@ -80,7 +79,7 @@ def change_otree_password(request, instance_id):
         form = Change_OTree_Password(request.POST or None, instance = inst)
         if form.is_valid():
             user = form.save()
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
 
         else:
             form = Change_OTree_Password(request.POST)
@@ -88,6 +87,21 @@ def change_otree_password(request, instance_id):
         form = Change_OTree_Password()
 
     return render(request, 'dm/change_otree_password.html', {'form': form})
+
+@login_required
+def scale_app(request, instance_id):
+    inst = oTreeInstance.objects.get(id=instance_id)
+    form = Change_Scaling_Form(request.POST or None, instance = inst)
+    
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.save()
+            return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
+
+        else:
+            form = Change_Scaling_Form(request.POST)
+
+    return render(request, 'dm/scale_app.html', {'form': form, 'instance_id':instance_id})
 
 @login_required
 @permission_required('dm.add_users', login_url='login', raise_exception=True)
@@ -149,9 +163,7 @@ def reset_otree_password(request, instance_id=None):
     inst = oTreeInstance.objects.get(id=instance_id)
     print('otree password reset')
 
-
     inst.set_default_environment(request.user.id)
-    # do stuff
 
     return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
 
@@ -169,4 +181,19 @@ def reset_database(request, instance_id=None):
     print('otree database reset')
 
     inst.reset_database(request.user.id)
+    return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
+
+@login_required
+def restart_app(request, instance_id=None):
+    if instance_id == None:
+        return HttpResponseRedirect('/')
+
+    inst = oTreeInstance.objects.get(id=instance_id)
+    perms = get_permissions(request.user, inst)
+    if not perms['can_restart']:
+        return HttpResponseRedirect('/')
+
+    print('restart app')
+
+    inst.restart_dokku_app(request.user.id)
     return HttpResponseRedirect(reverse('detail', args=(instance_id,)))

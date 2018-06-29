@@ -33,6 +33,14 @@
 					<td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
 				</tr>
 				<tr>
+					<td>Web Dynos</td>
+					<td id="web_dynos">{{ instance.web_dynos }}</td>
+				</tr>
+				<tr>
+					<td>Worker Dynos</td>
+					<td id="worker_dynos">{{ instance.worker_dynos }}</td>
+				</tr>
+				<tr>
 					<td>oTree Admin Username</td>
 					<td id="admin_username">{{ instance.otree_admin_username }}</td>
 				</tr>
@@ -58,9 +66,12 @@
 			<span id="reset_database_button">
 				<a href="{% url 'reset_database' instance_id=instance.id %}" class="ui basic red button">Reset Database</a>
 			</span>
+			<span id="scale_button">
+				<a href="{% url 'scale_app' instance_id=instance.id %}" class="ui basic green button">Scale Dynos</a>
+			</span>
 			<span id="restart_button_span">
 			{% if permissions.can_restart and instance.deployed %}
-				<a id="restart_button" class="ui orange basic button">Restart Instance</a>
+				<a href="{% url 'restart_app' instance_id=instance.id %}" id="restart_button" class="ui orange basic button">Restart Instance</a>
 			{% endif %}
 			</span>
 			<span id="delete_button_span">
@@ -145,7 +156,7 @@
 					$("#"+key).html(report_dict[key]);
 				}
 				if (report_dict['deployed'] == true) {
-					$("#restart_button_span").html("<a id='restart_button' class='ui orange basic button'>Restart Instance</a>");
+					$("#restart_button_span").html("<a href=\"{% url 'restart_app' instance_id=instance.id %}\" id=\"restart_button\" class=\"ui orange basic button\">Restart Instance</a>");
 				}
 			}
 		}

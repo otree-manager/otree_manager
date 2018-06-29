@@ -3,6 +3,8 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 from .choices import *
 
 from channels.layers import get_channel_layer
@@ -47,6 +49,11 @@ class oTreeInstance(models.Model):
     otree_auth_level = models.CharField(max_length=200, blank=True)
     otree_production = models.IntegerField(null=True, blank=True)
 
+    web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
+                                       MaxValueValidator(settings.MAX_WEB)], default=1)
+    worker_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(settings.MIN_WORKERS),
+                                       MaxValueValidator(settings.MAX_WORKERS)], default=1)
+
     def __str__(self):
         return self.name
 
@@ -67,11 +74,37 @@ class oTreeInstance(models.Model):
             },
         )
 
+    def scale_dokku_app(self, user_id=-1):
+        dyno_dict = {
+            'web': str(self.web_dynos),
+            'worker': str(self.worker_dynos),
+        }
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks", 
+            {
+                'type': 'scale_app',
+                'instance_name': self.name,
+                'user_id': user_id,
+                'var_dict': dyno_dict,
+            }
+        )
+
+
     def create_dokku_app(self, user_id):
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
             {
                 "type": "create.app",
+                "user_id": user_id,
+                "instance_name": self.name
+            },
+        )
+
+    def restart_dokku_app(self, user_id):
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "restart.app",
                 "user_id": user_id,
                 "instance_name": self.name
             },
