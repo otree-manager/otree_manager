@@ -197,3 +197,9 @@ def restart_app(request, instance_id=None):
 
     inst.restart_dokku_app(request.user.id)
     return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
+
+def imprint(request):
+	return render(request, 'dm/imprint.html', {})
+
+def privacy(request):
+	return render(request, 'dm/privacy.html', {})

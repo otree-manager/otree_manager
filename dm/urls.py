@@ -6,6 +6,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('imprint/', views.imprint, name='imprint'),
+    path('privacy/', views.privacy, name='privacy'),
 
     path('login/', auth_views.login, { 'template_name': 'dm/login.html' }, name='login'),
     path('logout/', auth_views.logout, {'template_name': 'dm/logout.html' }, name="logout"),
@@ -32,6 +34,6 @@ urlpatterns = [
     path('change_otree_password/<int:instance_id>', views.change_otree_password, name="change_otree_password"),
     path('reset_database/<int:instance_id>', views.reset_database, name="reset_database"),
     path('restart_app/<int:instance_id>', views.restart_app, name="restart_app"),
+	path('scale/<int:instance_id>', views.scale_app, name="scale_app"),
 
-    path('scale/<int:instance_id>', views.scale_app, name="scale_app"),
 ]
