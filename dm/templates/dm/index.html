@@ -4,20 +4,30 @@
     <title>oTree Manager Home</title>
 {% endblock %}
 
+{% block menu %}
+
+    <div class="ui dropdown icon item">
+        <i class="red wrench icon"></i>
+        <div class="menu">
+            {% if perms.can_add_instance %}
+            <a class="item" href="/new_app">
+                <i class="hdd icon"></i>
+                New oTree Server
+            </a>
+            {% endif %}
+            <div class="divider"></div>
+            {% if perms.can_add_user %}
+            <a class="item" href="/new_user">
+                <i class="user plus icon"></i>
+                New Experimenter
+            </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
 {% block content %}
     <h1>oTree Manager</h1>
-    <div class="ui divider"></div>
-    <div>
-        {% if perms.can_add_instance %}
-            <a class="ui primary button" href="/new_app">New Instance</a>
-        {% endif %}
-        {% if perms.can_add_user %}
-            <a class="ui primary button" href="/new_user">Add User</a>
-        {% endif %}
-        <a class="ui basic button" href="/password_change">Change Password</a>
-        <a class="ui basic button" href="/change_key_file">Change Key File</a>
-        <a class="ui basic button" href="/logout">Logout</a><br>
-    </div>
     <div class="ui divider"></div>
     <h2>Active oTree instances</h2>
     <div class="ui relaxed divided list">

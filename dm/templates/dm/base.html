@@ -39,6 +39,36 @@
         {% block head %}
         {% endblock %}
     <body>
+        <div class="ui menu">
+            <a class="item" href="/">
+                <i class="home icon"></i>
+            </a>
+            {% block menu %}
+            {% endblock %}
+            <div class="right menu">
+                <div class="ui dropdown icon item" id="user_navigation">
+                    <i class="blue user icon"></i>
+                    <div class="menu">
+                        <a class="item" href="/password_change">
+                            <i class="edit icon"></i>
+                            Change password
+                        </a>
+
+                        <a class="item" href="/change_key_file">
+                            <i class="id card icon"></i>
+                            Change ssh key
+                        </a>
+
+                        <div class="divider"></div>
+
+                        <a class="item" href="/logout">
+                            <i class="red sign out alternate icon"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class='ui container'>
             {% block content %}
             {% endblock %}
@@ -53,6 +83,7 @@
             $('.message .close').on('click', function() {
                 $(this).closest('.message').transition('fade');
             });
+            $('.dropdown').dropdown();
         </script>
         {% block scripts %}
         {% endblock %}
