@@ -37,8 +37,13 @@
             <div class="field">
                 {{ form.role.errors }}
                 {{ form.role.label_tag }}
-                {{ form.role }}
-               
+                <select class="ui search dropdown" id="id_role" name="role">
+                    <i class="dropdown icon"></i>
+                    {% for choice in form.role %}
+                        {{ choice }}
+                    {% endfor %}
+                </select>
+                
             </div>
             <button class="ui primary button" type="submit">Create Account</button>
             <a class="ui basic button" href="{% url 'index' %}">Go Back</a>
