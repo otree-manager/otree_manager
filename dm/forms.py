@@ -16,6 +16,17 @@ _ = gettext.gettext
 
 
 
+class Change_Key_Form(forms.ModelForm):
+    class Meta:
+        model = UserModel
+        fields = ['public_key_file']
+
+    def save(self, commit=True):
+        user = super().save()
+        user.set_public_key()
+        return user
+
+
 class Add_New_Instance_Form(forms.ModelForm):
     class Meta:
         model = oTreeInstance
@@ -23,7 +34,6 @@ class Add_New_Instance_Form(forms.ModelForm):
 
 
 class Change_OTree_Password(forms.ModelForm):
-
     password_2 = forms.CharField(label="Password confirmation", max_length="100", widget=forms.PasswordInput())
 
     class Meta:

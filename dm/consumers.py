@@ -255,6 +255,43 @@ class Dokku_Tasks(SyncConsumer):
         self._notify_user(event, "restart_app", proc.returncode)
 
 
+    def user_add_key(self, event):
+        print('received user add key event')
+        proc = subprocess.run(['sudo', 'dokku', 'ssh-keys:add', event['user_name'], event['key_path']])
+        if proc.returncode != 0:
+            # notify user of error then return
+            self._notify_user(event, "add_key", proc.returncode)
+            return False
+
+        # success
+        self._notify_user(event, "add_key", proc.returncode)
+
+    def user_remove_key(self, event):
+        print('received user remove key event')
+        proc = subprocess.run(['sudo', 'dokku', 'ssh-keys:remove', event['user_name']])
+        
+        if proc.returncode != 0:
+            # notify user of error then return
+            self._notify_user(event, "remove_key", proc.returncode)
+            return False
+
+        # success
+        self._notify_user(event, "remove_key", proc.returncode)
+
+
+    def add_git_permission(self, event):
+        print('received user add acl event')
+        proc = subprocess.run(['sudo', 'dokku', 'acl:add', event["instance_name"], event['user_name']])
+        if proc.returncode != 0:
+            # notify user of error then return
+            self._notify_user(event, "add_acl", proc.returncode)
+            return False
+
+        # success
+        self._notify_user(event, "add_acl", proc.returncode)
+
+
+
     def _notify_user(self, event, situation, returncode):
         #print(user_id, result, message)
         if event['user_id'] == -1:
@@ -289,11 +326,14 @@ class Dokku_Tasks(SyncConsumer):
                 "link_plugin": "Plugin {} has been created and linked to {} successfully.",
                 "destroy_plugin": "Plugin {} has been destroyed successfully.",
                 "create_plugin": "",
-                "create_app": "App {} was created successfully. <br/>Databases will now be created and linked.",
-                "destroy_app": "App {} was destroyed successfully. <br/>Databases will now be removed.",
+                "create_app": "App {} was created successfully.",
+                "destroy_app": "App {} was destroyed successfully.",
                 "reset_database": "Database for app {} was reset successfully.",
                 "restart_app": "App {} was restarted successfully.",
                 "scale_app": "Workers for app {} have been adjusted successfully.",
+                "add_acl": "{0} has been granted Git permissions for app {1}.",
+                "add_key": "Public key for {} has been set.",
+                "remove_key": "Public key for {} has been removed.",
             },
             "warning": {
 
@@ -308,6 +348,9 @@ class Dokku_Tasks(SyncConsumer):
                 "reset_database": "An error occured while resetting database for {}.",
                 "restart_app": "An error occured while restarting {}.",
                 "scale_app": "Workers for app {} could not be adjusted.",
+                "add_acl": "Git permissions for app {1} could not be granted to {0}.",
+                "add_key": "Public key for {} could not be set.",
+                "remove_key": "Public key for {} could not be removed.",
             },
             "info" : {
 
@@ -315,15 +358,18 @@ class Dokku_Tasks(SyncConsumer):
         }
 
         string_input_dict = {
-            "set_env": (event["instance_name"], ),
-            "link_plugin": (event.get("plugin_name", ''), event["instance_name"]),
+            "set_env": (event.get("instance_name", ''), ),
+            "link_plugin": (event.get("plugin_name", ''), event.get("instance_name", '')),
             "destroy_plugin": (event.get("plugin_name", ''),),
             "create_plugin": (event.get("plugin_name", ''),),
-            "create_app": (event["instance_name"],),
-            "destroy_app": (event["instance_name"],),
-            "reset_database": (event["instance_name"],),
-            "restart_app": (event["instance_name"],),
-            "scale_app": (event["instance_name"],),
+            "create_app": (event.get("instance_name", ''),),
+            "destroy_app": (event.get("instance_name", ''),),
+            "reset_database": (event.get("instance_name", ''),),
+            "restart_app": (event.get("instance_name", ''),),
+            "scale_app": (event.get("instance_name", ''),),
+            "add_acl": (event.get("user_verbose_name", ''), event.get("instance_name", '')),
+            "add_key": (event.get("user_verbose_name", ''),),
+            "remove_key": (event.get("user_verbose_name", ''),),
         }
 
 

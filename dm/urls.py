@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/', auth_views.logout, {'template_name': 'dm/logout.html' }, name="logout"),
 
     path('new_user/', views.new_user, name='new_user'),
+    path('change_key_file/', views.change_key_file, name='change_key_file'),
 
     path('password_reset/', auth_views.password_reset, {'template_name': 'dm/password_reset.html' }, name='password_reset'),
     path('password_reset/done/', auth_views.password_reset_done, {'template_name': 'dm/password_reset_done.html' },

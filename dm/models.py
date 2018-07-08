@@ -16,11 +16,48 @@ import random
 channel_layer = get_channel_layer()
 
 
+def path_and_filename(instance, filename):
+            return 'keyfiles/keyfile_id_{0}'.format(instance.id)
+
+
 class User(AbstractUser):
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
     ws_channel = models.CharField(max_length=255, blank=True)
+
+    public_key_set = models.BooleanField(default=False)
+    public_key_file = models.FileField(upload_to=path_and_filename)
+
+    def set_public_key(self):
+        if self.public_key_set:
+            # remove key
+            async_to_sync(channel_layer.send)(
+                "dokku_tasks",
+                {
+                    "type": "user.remove.key",
+                    "user_id": self.id,
+                    "user_name": self.username,
+                    "user_verbose_name": self.__str__(),
+                },
+            )
+            self.public_key_set = False
+            self.save()   
+
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "user.add.key",
+                "user_id": self.id,
+                "user_name": self.username,
+                "user_verbose_name": self.__str__(),
+                "key_path": self.public_key_file.path,
+            },
+        )
+        self.public_key_set = True
+        self.save()
+        
+
 
 class oTreeInstance(models.Model):
     class Meta:
@@ -99,6 +136,16 @@ class oTreeInstance(models.Model):
                 "instance_name": self.name
             },
         )
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "add.git.permission",
+                "user_id": user_id,
+                "user_name": self.owned_by.username,
+                "user_verbose_name": self.owned_by.__str__(),
+                "instance_name": self.name
+            },
+        )
 
     def restart_dokku_app(self, user_id):
         async_to_sync(channel_layer.send)(
@@ -124,7 +171,7 @@ class oTreeInstance(models.Model):
     def set_default_environment(self, user_id=-1):
         self.otree_production = 1
         self.otree_admin_username = "admin"
-        self.otree_admin_password = self._get_random_password()
+        self.otree_admin_password = self.make_random_password(),
         self.otree_auth_level = "STUDY"
         self.save()
 
@@ -162,5 +209,3 @@ class oTreeInstance(models.Model):
         )
 
        
-    def _get_random_password(self, length=20, chars=string.ascii_letters + string.digits):
-        return "".join(random.choice(chars) for i in range(length))

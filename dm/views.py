@@ -9,7 +9,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.forms import PasswordResetForm
 
 from .models import oTreeInstance, User
-from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password, Change_Scaling_Form
+from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password, Change_Scaling_Form, Change_Key_Form
 
 
 
@@ -33,6 +33,9 @@ def get_permissions(user, instance=None):
 
 @login_required
 def index(request):
+    if not request.user.public_key_set:
+        return HttpResponseRedirect(reverse('change_key_file'))
+
     if request.user.groups.filter(name='Admins').exists():
         show_instances = oTreeInstance.objects.order_by('name').all()
     else:
@@ -43,6 +46,19 @@ def index(request):
 
 
 @login_required
+def change_key_file(request):
+    if request.method == 'POST':
+        form = Change_Key_Form(request.POST or None, request.FILES or None, instance=request.user)
+        if form.is_valid():
+            user = form.save()
+            return HttpResponseRedirect(reverse('index'))
+    else:
+        form = Change_Key_Form()
+
+    context = { 'form': form }
+    return render(request, 'dm/change_key_file.html', context)
+
+@login_required
 @permission_required('dm.add_otreeinstance', login_url='/login/', raise_exception=True)
 def new_app(request):
     if request.method == 'POST':
@@ -51,7 +67,7 @@ def new_app(request):
         if form.is_valid():
             new_instance = form.save()
             new_instance.create_dokku_app(request.user.id)
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('index'))
     else:
         form = Add_New_Instance_Form(initial = {'enabled_plugins': [1, 2] })
 
@@ -78,7 +94,7 @@ def change_otree_password(request, instance_id):
         inst = oTreeInstance.objects.get(id=instance_id)
         form = Change_OTree_Password(request.POST or None, instance = inst)
         if form.is_valid():
-            user = form.save()
+            inst = form.save()
             return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
 
         else:
@@ -118,7 +134,7 @@ def new_user(request):
                 subject_template_name='dm/emails/user_registration_subject.txt',
                 email_template_name='dm/emails/user_registration.html',
             )
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('index'))
     else:
         form = Add_User_Form()
     return render(request, 'dm/new_user.html', {'form': form})
@@ -127,12 +143,12 @@ def new_user(request):
 @login_required
 def detail(request, instance_id=None):
     if instance_id == None:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     inst = oTreeInstance.objects.get(id=instance_id)
     perms = get_permissions(request.user, inst)
     if not perms['can_view']:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     inst.refresh_from_dokku(request.user.id)
 
@@ -142,23 +158,23 @@ def detail(request, instance_id=None):
 @login_required
 def delete(request, instance_id=None):
     if instance_id == None:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     
     inst = oTreeInstance.objects.get(id=instance_id)
     perms = get_permissions(request.user, inst)
     if not perms['can_delete']:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
     print('try destroy')
     inst.destroy_dokku_app(request.user.id)
     
-    return HttpResponseRedirect('/')
+    return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
 def reset_otree_password(request, instance_id=None):
     if instance_id == None:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
     
     inst = oTreeInstance.objects.get(id=instance_id)
     print('otree password reset')
@@ -171,12 +187,12 @@ def reset_otree_password(request, instance_id=None):
 @login_required
 def reset_database(request, instance_id=None):
     if instance_id == None:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     inst = oTreeInstance.objects.get(id=instance_id)
     perms = get_permissions(request.user, inst)
     if not perms['can_reset']:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     print('otree database reset')
 
@@ -186,12 +202,12 @@ def reset_database(request, instance_id=None):
 @login_required
 def restart_app(request, instance_id=None):
     if instance_id == None:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     inst = oTreeInstance.objects.get(id=instance_id)
     perms = get_permissions(request.user, inst)
     if not perms['can_restart']:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     print('restart app')
 
@@ -199,7 +215,7 @@ def restart_app(request, instance_id=None):
     return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
 
 def imprint(request):
-	return render(request, 'dm/imprint.html', {})
+    return render(request, 'dm/imprint.html', {})
 
 def privacy(request):
-	return render(request, 'dm/privacy.html', {})
+    return render(request, 'dm/privacy.html', {})
