@@ -47,6 +47,7 @@ class Dokku_Tasks(SyncConsumer):
         # success
         self._notify_user(event, "create_app", proc.returncode)
 
+
         # create plugins
         async_to_sync(self.channel_layer.send)("dokku_tasks", {
             'type': 'create_plugin',
@@ -222,8 +223,6 @@ class Dokku_Tasks(SyncConsumer):
     
         for key, value in event["var_dict"].items():
             cmd.append('%s=%s' % (key, value))
-
-        print(cmd)
 
         proc = subprocess.run(cmd, stdout=subprocess.PIPE)
                 

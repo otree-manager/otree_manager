@@ -12,12 +12,16 @@ from asgiref.sync import async_to_sync
 
 import string
 import random
+import os
 
 channel_layer = get_channel_layer()
 
 
 def path_and_filename(instance, filename):
-            return 'keyfiles/keyfile_id_{0}'.format(instance.id)
+    file_path = 'keyfiles/keyfile_id_{0}'.format(instance.id)
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+    return file_path
 
 
 class User(AbstractUser):
@@ -99,8 +103,8 @@ class oTreeInstance(models.Model):
         return git_url
 
     def url(self):
-        return "http://%s.%s" % (self.name, settings.DOKKU_DOMAIN
-)
+        return "http://%s.%s" % (self.name, settings.DOKKU_DOMAIN)
+
     def refresh_from_dokku(self, user_id):
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
@@ -171,7 +175,7 @@ class oTreeInstance(models.Model):
     def set_default_environment(self, user_id=-1):
         self.otree_production = 1
         self.otree_admin_username = "admin"
-        self.otree_admin_password = self.make_random_password(),
+        self.otree_admin_password = User.objects.make_random_password()
         self.otree_auth_level = "STUDY"
         self.save()
 
@@ -186,6 +190,8 @@ class oTreeInstance(models.Model):
             'OTREE_ADMIN_PASSWORD': self.otree_admin_password,
             'OTREE_AUTH_LEVEL': self.otree_auth_level
         }
+
+        print(env_vars_dict)
 
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
