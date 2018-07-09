@@ -4,12 +4,19 @@
     <title>Change Key File</title>
 {% endblock %}
 
+{% block menu %}
+    <div class="item header">
+        Key File
+    </div>
+{% endblock %}
+
 {% block content %}
     <div class="ui form error segment">
         <h1>Change Key File</h1>
-        <p>Please upload a file containing your public key to use for deploying your oTree code.<br>
-            Typically it is located at ~/.ssh/id_rsa.pub<br>
-            Ask your Lab Manager for assistance if you are unsure about this.</p>
+        <p>Please upload your ssh public key file to use for deploying your oTree code.<br/>
+            Ask your Lab Manager for assistance if you are unsure about this.</br/>
+            Typically it is located at ~/.ssh/id_rsa.pub</p>
+
         <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.non_field_errors %}

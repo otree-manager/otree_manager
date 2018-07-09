@@ -15,9 +15,10 @@
             }
             #notifications_container {
                 position: fixed;
-                bottom: 25px;
+                bottom: 35px;
                 left: 50%;
                 width: 80%;
+                margin-bottom: 5px;
                 transform: translate(-50%, 0%);
             }
             .hidden {
@@ -32,6 +33,19 @@
                 padding-left: 5px;
                 text-align: right;
             }
+            .ui.menu {
+                border-radius: 0px !important;
+                -webkit-box-shadow: none !important;
+                box-shadow: none !important;
+            }
+            .oTreeInstance {
+                width: 180px;
+                height: 120px;
+                overflow-wrap: break-word;
+            }
+            .oTreeInstance .icon {
+                margin: 0 !important;
+            }
         </style>
         {% block styles %}
 
@@ -41,47 +55,52 @@
     <body>
         {% if request.user.is_authenticated %}
         <div class="ui menu">
-            <a class="item" href="/">
+            <a class="item" href="{%url 'index' %}">
                 <i class="home icon"></i>
             </a>
-            {% if perms.is_admin %}
-                <div class="ui dropdown icon item">
-                    <i class="red cogs icon"></i>
-                    <div class="menu">
-                        <a class="item" href="/new_app">
-                            <i class="hdd icon"></i>
-                            Add oTree Server
-                        </a>
-                        
-                        <div class="divider"></div>
-                        
-                        <a class="item" href="/new_user">
-                            <i class="user plus icon"></i>
-                            Add User
-                        </a>
-                        
-                    </div>
-                </div>
-            {% endif %}
             {% block menu %}
             {% endblock %}
             <div class="right menu">
+                {% if perms.is_admin %}
+                    <div class="ui dropdown icon item">
+                        <i class="orange wrench icon"></i>
+                        <div class="menu">
+                            <a class="item" href="{%url 'new_app' %}">
+                                <i class="hdd icon"></i>
+                                Add Container
+                            </a>
+                            
+                            <div class="divider"></div>
+                            
+                            <a class="item" href="/users">
+                                <i class="users icon"></i>
+                                Edit Users
+                            </a>
+
+                            <a class="item" href="{%url 'new_user' %}">
+                                <i class="user plus icon"></i>
+                                Add User
+                            </a>
+                            
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="ui dropdown icon item" id="user_navigation">
-                    <i class="blue user icon"></i>
+                    <i class="user icon"></i>
                     <div class="menu">
-                        <a class="item" href="/password_change">
+                        <a class="item" href="{%url 'password_change' %}">
                             <i class="edit icon"></i>
                             Change Password
                         </a>
 
-                        <a class="item" href="/change_key_file">
+                        <a class="item" href="{%url 'change_key_file' %}">
                             <i class="id card icon"></i>
                             Change SSH Key
                         </a>
 
                         <div class="divider"></div>
 
-                        <a class="item" href="/logout">
+                        <a class="item" href="{%url 'logout' %}">
                             <i class="red sign out alternate icon"></i>
                             Logout
                         </a>
@@ -101,9 +120,6 @@
             <a href="{% url 'imprint' %}">Imprint</a> | <a href="{% url 'privacy' %}">Privacy</a>
         </div>
         <script type='text/javascript'>
-            $('.message .close').on('click', function() {
-                $(this).closest('.message').transition('fade');
-            });
             $('.dropdown').dropdown();
         </script>
         {% block scripts %}

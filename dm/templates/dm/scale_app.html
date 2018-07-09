@@ -3,10 +3,15 @@
 {% block head %}
     <title>Scale Dynos</title>
 {% endblock %}
-
+{% block menu %}
+    <div class="item header">
+        Scaling
+    </div>
+{% endblock %}
 {% block content %}
     <div class="ui form error segment">
         <h1>Scale Dynos</h1>
+        <p>Typically, one web dyno and one worker dyno are enough for laboratory experiments. If you need more capacity, you can scale up the number of dynos here. Ask your Lab Manager if you are unsure.</p>
         <form method="post">
         {% csrf_token %}
         {% if form.non_field_errors %}
@@ -26,7 +31,6 @@
             {{ form.worker_dynos }}
         </div>
         <button class="ui primary button" type="submit">Change Workers</button>
-        <a class="ui basic button" href="{% url 'detail' instance_id=instance_id %}">Go Back</a>
     </form>
     </div>
 {% endblock %}

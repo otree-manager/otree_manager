@@ -5,35 +5,43 @@
 {% endblock %}
 
 {% block menu %}
-    
-{% endblock %}
-
-{% block content %}
-    <h1>oTree Manager</h1>
-    <div class="ui divider"></div>
-    <h2>Active oTree instances</h2>
-    <div class="ui relaxed divided list">
-        {% for instance in instances %}
-            <div class="item">
-                <i class="large middle aligned server icon"></i>
-                <div class="content">
-                    <a class="header" href="detail/{{ instance.id }}">{{ instance.name }} <div class="ui inline mini loader"></div></a>
-                    <p class="description">assigned to {{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</p>
-                </div>
-            </div>
-        {% endfor %}
+    <div class="item header">
+        oTree Manager
     </div>
 {% endblock %}
 
-{% block scripts %}
-    <script type="text/javascript">
-        $(".close.icon").click(function(){
-            $(this).parent().hide();
-        });
-
-        $('#long_task').click(function() {
-            wsBridge.send({'action':'run', 'message':'long_task'});
-            console.log('action: run, message: long_task');
-        });
-    </script>
+{% block content %}
+    {% if not instances %}
+        <p align="center">You have not been assigend any oTree containers.<br/>Ask your Lab Manager to create one for you.</p>
+    {% endif %}
+    <div class="ui centered stackable grid">
+        {% for instance in instances %}
+            <div class="four wide column">
+                <a class="ui basic button oTreeInstance" href="detail/{{ instance.id }}">
+                    <p>
+                        {% if instance.deployed %}
+                            <i class="big green hdd icon"></i>
+                        {% else %}
+                            <i class="big blue hdd icon"></i>
+                        {% endif %}
+                    </p>
+                    <p><b>{{ instance.name }}</b></p>
+                    <p>{{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</p>
+                </a>
+            </div>
+        {% endfor %}
+        {% if perms.is_admin %}
+            <div class="four wide column">
+                <a class="ui basic button oTreeInstance" href="/new_app">
+                    <p>
+                        <i class="big icons">
+                            <i class="hdd icon"></i>
+                            <i class="top right corner orange add icon"></i>
+                        </i>
+                    </p>
+                    <p><b>Create oTree Container</b></p>
+                </a>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

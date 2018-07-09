@@ -34,7 +34,7 @@ urlpatterns = [
     path('reset_otree_password/<int:instance_id>', views.reset_otree_password, name="reset_otree_password"),
     path('change_otree_password/<int:instance_id>', views.change_otree_password, name="change_otree_password"),
     path('reset_database/<int:instance_id>', views.reset_database, name="reset_database"),
-    path('restart_app/<int:instance_id>', views.restart_app, name="restart_app"),
+    path('restart/<int:instance_id>', views.restart_app, name="restart"),
 	path('scale/<int:instance_id>', views.scale_app, name="scale_app"),
 
 ]

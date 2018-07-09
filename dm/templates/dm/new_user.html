@@ -3,10 +3,14 @@
 {% block head %}
     <title>New User</title>
 {% endblock %}
-
+{% block menu %}
+    <div class="item header">
+        Add User
+    </div>
+{% endblock %}
 {% block content %}
     <div class="ui form error segment">
-        <h1>New User</h1>
+        <h1>Add User</h1>
         <form action="/new_user/" method="post">
             {% csrf_token %}
             {% if form.non_field_errors %}
@@ -45,8 +49,7 @@
                 </select>
                 
             </div>
-            <button class="ui primary button" type="submit">Create Account</button>
-            <a class="ui basic button" href="{% url 'index' %}">Go Back</a>
+            <button class="ui primary button" type="submit">Create</button>
         </form>
     </div>
 {% endblock %}

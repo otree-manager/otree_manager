@@ -38,9 +38,9 @@ def index(request):
         return HttpResponseRedirect(reverse('change_key_file'))
 
     if request.user.groups.filter(name='Admins').exists():
-        show_instances = oTreeInstance.objects.order_by('name').all()
+        show_instances = oTreeInstance.objects.order_by('deployed', 'name').all()
     else:
-        show_instances = oTreeInstance.objects.filter(owned_by=request.user).order_by('name')
+        show_instances = oTreeInstance.objects.filter(owned_by=request.user).order_by('deployed', 'name')
     perms = get_permissions(request.user)
     context = { 'instances': show_instances, 'permissions': perms, 'user': request.user }
     return render(request, 'dm/index.html', context)

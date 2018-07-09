@@ -7,10 +7,14 @@
         }
     </style>
 {% endblock %}
-
+{% block menu %}
+    <div class="item header">
+        Add Container
+    </div>
+{% endblock %}
 {% block content %}
     <div class="ui segment">
-        <h1>New Instance</h1>
+        <h1>Add Container</h1>
         <form method="POST" action="/new_app/">
             {% csrf_token %}
             <div class="ui error form">
@@ -54,9 +58,6 @@
                 <button class="ui primary button">
                     Create
                 </button>
-                <a class="ui basic button" href="{% url 'index' %}">
-                    Go Back
-                </a>
             </div>
         </form>
     </div>

@@ -1,164 +1,208 @@
 {% extends 'dm/base_ws.html' %}
 {% block head %}
-	<title>Detail view</title>
+    <title>Detail view</title>
 {% endblock%}
+{% block menu %}
+    <div class="item header">
+        Details
+    </div>
+{% endblock %}
 {% block content %}
-	<div class="ui segment">
-		<h1>{{ instance.name }}</h1>
-		<p><b>Status Report</b></p>
-		<table class="ui very basic compact table">
-			<tbody>
-				<tr>
-					<td>Experimenter</td>
-					<td>{{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</td>
-				</tr>
-				<tr>
-					<td>Git Repository URL</td>
-					<td id="git_url">{{ instance.git_url }} </td>
-				</tr>
-				<tr>
-					<td>Git SHA</td>
-					<td id="git_sha">{{ instance.git_sha }}</td>
-				</tr>
-				<tr>
-					<td>Deployed</td>
-					<td id="deployed">{{ instance.deployed }}</td>
-				</tr>
-				<tr>
-					<td>Deploy Source</td>
-					<td id="deploy_source">{{ instance.deploy_source }}</td>
-				</tr>
-				<tr>
-					<td>URL</td>
-					<td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
-				</tr>
-				<tr>
-					<td>Web Dynos</td>
-					<td id="web_dynos">{{ instance.web_dynos }}</td>
-				</tr>
-				<tr>
-					<td>Worker Dynos</td>
-					<td id="worker_dynos">{{ instance.worker_dynos }}</td>
-				</tr>
-				<tr>
-					<td>oTree Admin Username</td>
-					<td id="admin_username">{{ instance.otree_admin_username }}</td>
-				</tr>
-				<tr>
-					<td>oTree Admin Password</td>
-					<td id="admin_password">{{ instance.otree_admin_password }}</td>
-				</tr>
-				<tr>
-					<td>oTree Auth Level</td>
-					<td id="auth_level">{{ instance.otree_auth_level }}</td>
-				</tr>
-				<tr>
-					<td>oTree Production</td>
-					<td id="otree_production">{{ instance.otree_production }}</td>
-				</tr>
-			</tbody>
-		</table>
-		<div>
-			<span id="back_button_span"><a href="{%url 'index' %}" class="ui basic button">Go Back</a></span>
-			<span id="change_password_button">
-				<a href="{% url 'change_otree_password' instance_id=instance.id %}" class="ui basic blue button">Change Admin Password</a>
-			</span>
-			<span id="reset_database_button">
-				<a href="{% url 'reset_database' instance_id=instance.id %}" class="ui basic red button">Reset Database</a>
-			</span>
-			<span id="scale_button">
-				<a href="{% url 'scale_app' instance_id=instance.id %}" class="ui basic green button">Scale Dynos</a>
-			</span>
-			<span id="restart_button_span">
-			{% if permissions.can_restart and instance.deployed %}
-				<a href="{% url 'restart_app' instance_id=instance.id %}" id="restart_button" class="ui orange basic button">Restart Instance</a>
-			{% endif %}
-			</span>
-			<span id="delete_button_span">
-			{% if permissions.can_delete %}
-				<a id="delete_button" class="ui button negative">Delete Instance</a>
-			{% endif %}
-			</span>
-		</div>
-	</div>
-	<div class="ui basic modal" id="restart_modal">
-		<div class="ui icon header">
-			<i class="redo alternate icon"></i>
-			Restart oTree Instance
-		</div>
-		<div class="content">
-			<p style="text-align: center;">Are you sure you want to restart this instance?</p>
-		</div>
-		<div class="actions">
-			<div class="ui red inverted deny button">
-				<i class="remove icon"></i>
-				No
-			</div>
-			<div class="ui inverted basic approve button">
-				<i class="checkmark icon"></i>
-				Yes
-			</div>
-		</div>
-	</div>
-	<div class="ui basic modal" id="delete_modal">
-		<div class="ui icon header">
-			<i class="trash icon"></i>
-			Delete oTree Instance
-		</div>
-		<div class="content">
-			<p style="text-align: center;">Are you sure you want to delete this instance?</p>
-		</div>
-		<div class="actions">
-			<div class="ui red inverted deny button">
-				<i class="remove icon"></i>
-				No
-			</div>
-			<div class="ui inverted basic approve button">
-				<i class="checkmark icon"></i>
-				Yes
-			</div>
-		</div>
-	</div>
+    <div class="ui segment">
+
+        <div class="ui stackable grid">
+            <div class="fourteen wide column">
+                <table class="ui very basic compact table">
+                    <h1>{{ instance.name }}</h1>
+                    <p><b>Status Report</b></p>
+                    <tbody>
+                        <tr>
+                            <td>Experimenter</td>
+                            <td>{{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Git Repository URL</td>
+                            <td id="git_url">{{ instance.git_url }} </td>
+                        </tr>
+                        <tr>
+                            <td>Git SHA</td>
+                            <td id="git_sha">{{ instance.git_sha }}</td>
+                        </tr>
+                        <tr>
+                            <td>Deployed</td>
+                            <td id="deployed">{{ instance.deployed }}</td>
+                        </tr>
+                        <tr>
+                            <td>Deploy Source</td>
+                            <td id="deploy_source">{{ instance.deploy_source }}</td>
+                        </tr>
+                        <tr>
+                            <td>URL</td>
+                            <td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
+                        </tr>
+                        <tr>
+                            <td>Web Dynos</td>
+                            <td id="web_dynos">{{ instance.web_dynos }}</td>
+                        </tr>
+                        <tr>
+                            <td>Worker Dynos</td>
+                            <td id="worker_dynos">{{ instance.worker_dynos }}</td>
+                        </tr>
+                        <tr>
+                            <td>oTree Admin Username</td>
+                            <td id="admin_username">{{ instance.otree_admin_username }}</td>
+                        </tr>
+                        <tr>
+                            <td>oTree Admin Password</td>
+                            <td id="admin_password">{{ instance.otree_admin_password }}</td>
+                        </tr>
+                        <tr>
+                            <td>oTree Auth Level</td>
+                            <td id="auth_level">{{ instance.otree_auth_level }}</td>
+                        </tr>
+                        <tr>
+                            <td>oTree Production</td>
+                            <td id="otree_production">{{ instance.otree_production }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="two wide column right aligned">
+                <p>
+                    <a href="{% url 'change_otree_password' instance_id=instance.id %}" class="ui basic blue icon button" data-tooltip="Change Admin Password"  data-position="left center">
+                        <i class="edit icon"></i>
+                    </a>
+                </p>
+                <p>
+                    <a href="{% url 'scale_app' instance_id=instance.id %}" class="ui basic green icon button" data-tooltip="Scale Container"  data-position="left center">
+                        <i class="boxes icon"></i>
+                    </a>
+                </p>
+                <p>
+                    <a id="restart_button" class="ui orange basic icon button" data-tooltip="Restart"  data-position="left center">
+                        <i class="redo alternate icon"></i>
+                    </a>
+                </p>
+                <p>
+                    <a class="ui basic red icon button" data-tooltip="Reset Database" id="reset_database_button"  data-position="left center">
+                        <i class="database icon"></i>
+                    </a>
+                </p>
+                {% if permissions.is_admin %}
+                    <p>
+                        <a id="delete_button" class="ui grey basic button icon" data-tooltip="Delete"  data-position="left center">
+                            <i class="trash icon"></i>
+                        </a>
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="ui basic modal" id="restart_modal">
+        <div class="ui icon header">
+            <i class="redo alternate icon"></i>
+            Restart Container
+        </div>
+        <div class="content">
+            <p style="text-align: center;">Are you sure you want to restart this container?</p>
+        </div>
+        <div class="actions">
+            <div class="ui red inverted deny button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <div class="ui inverted basic approve button">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
+    <div class="ui basic modal" id="delete_modal">
+        <div class="ui icon header">
+            <i class="trash icon"></i>
+            Delete Container
+        </div>
+        <div class="content">
+            <p style="text-align: center;">Are you sure you want to delete this container?</p>
+        </div>
+        <div class="actions">
+            <div class="ui red inverted deny button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <div class="ui inverted basic approve button">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
+    <div class="ui basic modal" id="reset_modal">
+        <div class="ui icon header">
+            <i class="database icon"></i>
+            Reset Database
+        </div>
+        <div class="content">
+            <p style="text-align: center;">Are you sure you want to reset the database?<br>This cannot be undone!</p>
+        </div>
+        <div class="actions">
+            <div class="ui red inverted deny button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <div class="ui inverted basic approve button">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {%block scripts %}
-	<script type="text/javascript">
-		$(".ui.button.progress").on("click", function () {
-			$(this).addClass('loading');
-		});
-		$("#delete_button").click(function () {
-			$("#delete_modal").modal('setting', {
-				onApprove: function () {
-					$(".ui.approve.button").addClass('loading');
-					$(".ui.deny.button").addClass("disabled");
-					window.location.href = "/delete/{{ instance.id }}";
-					return false;
-				},
-				closable: false,
-			}).modal('show');
-		});
-		$("#restart_button").click(function () {
-			$("#restart_modal").modal('setting', {
-				onApprove: function () {
-					$(".ui.approve.button").addClass('loading');
-					$(".ui.deny.button").addClass("disabled");
-					window.location.href = "/restart/{{ instance.id }}";
-					return false;
-				},
-				closable: false,
-			}).modal('show');
-		});
-		function handle_ws_data(data, stream) {
-			console.log(data);
-			if (data["kind"] == "report") {
-				var report_dict = data["report"];
-				for (var key in report_dict) {
-					$("#"+key).html(report_dict[key]);
-				}
-				if (report_dict['deployed'] == true) {
-					$("#restart_button_span").html("<a href=\"{% url 'restart_app' instance_id=instance.id %}\" id=\"restart_button\" class=\"ui orange basic button\">Restart Instance</a>");
-				}
-			}
-		}
-	</script>
+    <script type="text/javascript">
+        $(".ui.button.progress").on("click", function () {
+            $(this).addClass('loading');
+        });
+        $("#delete_button").click(function () {
+            $("#delete_modal").modal('setting', {
+                onApprove: function () {
+                    $(".ui.approve.button").addClass('loading');
+                    $(".ui.deny.button").addClass("disabled");
+                    window.location.href = "/delete/{{ instance.id }}";
+                    return false;
+                },
+                closable: false,
+            }).modal('show');
+        });
+        $("#restart_button").click(function () {
+            $("#restart_modal").modal('setting', {
+                onApprove: function () {
+                    $(".ui.approve.button").addClass('loading');
+                    $(".ui.deny.button").addClass("disabled");
+                    window.location.href = "/restart/{{ instance.id }}";
+                    return false;
+                },
+                closable: false,
+            }).modal('show');
+        });
+        $("#reset_database_button").click(function () {
+            $("#reset_modal").modal('setting', {
+                onApprove: function () {
+                    $(".ui.approve.button").addClass('loading');
+                    $(".ui.deny.button").addClass("disabled");
+                    window.location.href = "/reset_database/{{ instance.id }}";
+                    return false;
+                },
+                closable: false,
+            }).modal('show');
+        });
+        function handle_ws_data(data, stream) {
+            console.log(data);
+            if (data["kind"] == "report") {
+                var report_dict = data["report"];
+                for (var key in report_dict) {
+                    $("#"+key).html(report_dict[key]);
+                }
+            }
+        }
+    </script>
 {% endblock %}
