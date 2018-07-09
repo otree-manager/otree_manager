@@ -26,6 +26,7 @@ def get_permissions(user, instance=None):
         'can_add_user': user.has_perm('dm.add_users'),
         'can_add_instance': user.has_perm('dm.add_otreeinstance'),
         'can_reset': user.has_perm('dm.can_reset'),
+        'is_admin': user.groups.filter(name='Admins').exists(),
     }
 
     return perms

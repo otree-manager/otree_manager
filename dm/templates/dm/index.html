@@ -5,25 +5,7 @@
 {% endblock %}
 
 {% block menu %}
-
-    <div class="ui dropdown icon item">
-        <i class="red wrench icon"></i>
-        <div class="menu">
-            {% if perms.can_add_instance %}
-            <a class="item" href="/new_app">
-                <i class="hdd icon"></i>
-                New oTree Server
-            </a>
-            {% endif %}
-            <div class="divider"></div>
-            {% if perms.can_add_user %}
-            <a class="item" href="/new_user">
-                <i class="user plus icon"></i>
-                New Experimenter
-            </a>
-            {% endif %}
-        </div>
-    </div>
+    
 {% endblock %}
 
 {% block content %}
