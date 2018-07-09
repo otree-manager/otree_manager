@@ -12,14 +12,27 @@
 
         <div class="ui stackable grid">
             <div class="fourteen wide column">
-                <table class="ui very basic compact table">
-                    <h1>{{ instance.name }}</h1>
-                    <p><b>Status Report</b></p>
+                <h1>
+                    {% if instance.deployed %}
+                        <i class="green hdd icon"></i> 
+                    {% else %}
+                        <i class="orange hdd icon"></i> 
+                    {% endif %}
+                    {{ instance.name }}
+                    <span class="experimenter">
+                        ({{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }})
+                    </span>
+                </h1>
+                <table class="ui very basic compact table">                   
                     <tbody>
-                        <tr>
-                            <td>Experimenter</td>
-                            <td>{{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</td>
-                        </tr>
+                        {% if instance.deployed %}
+                            <tr>
+                                <td>URL</td>
+                                <td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
+                            </tr>
+                        {% else %}
+
+                        {% endif %}
                         <tr>
                             <td>Git Repository URL</td>
                             <td id="git_url">{{ instance.git_url }} </td>
@@ -28,18 +41,7 @@
                             <td>Git SHA</td>
                             <td id="git_sha">{{ instance.git_sha }}</td>
                         </tr>
-                        <tr>
-                            <td>Deployed</td>
-                            <td id="deployed">{{ instance.deployed }}</td>
-                        </tr>
-                        <tr>
-                            <td>Deploy Source</td>
-                            <td id="deploy_source">{{ instance.deploy_source }}</td>
-                        </tr>
-                        <tr>
-                            <td>URL</td>
-                            <td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
-                        </tr>
+
                         <tr>
                             <td>Web Dynos</td>
                             <td id="web_dynos">{{ instance.web_dynos }}</td>
@@ -68,8 +70,15 @@
                 </table>
             </div>
             <div class="two wide column right aligned">
+                {% if instance.deployed %}
                 <p>
-                    <a href="{% url 'change_otree_password' instance_id=instance.id %}" class="ui basic blue icon button" data-tooltip="Change Admin Password"  data-position="left center">
+                    <a href="{{ instance.url }}" class="ui basic blue icon button" data-tooltip="Open"  data-position="left center" target="_blank">
+                        <i class="external alterante icon"></i>
+                    </a>
+                </p>
+                {% endif %}
+                <p>
+                    <a href="{% url 'change_otree_password' instance_id=instance.id %}" class="ui basic orange icon button" data-tooltip="Change Admin Password"  data-position="left center">
                         <i class="edit icon"></i>
                     </a>
                 </p>
@@ -79,12 +88,12 @@
                     </a>
                 </p>
                 <p>
-                    <a id="restart_button" class="ui orange basic icon button" data-tooltip="Restart"  data-position="left center">
+                    <a id="restart_button" class="ui purple basic icon button" data-tooltip="Restart"  data-position="left center">
                         <i class="redo alternate icon"></i>
                     </a>
                 </p>
                 <p>
-                    <a class="ui basic red icon button" data-tooltip="Reset Database" id="reset_database_button"  data-position="left center">
+                    <a class="ui basic red icon button" data-tooltip="Reset Database" id="reset_database_button" data-position="left center">
                         <i class="database icon"></i>
                     </a>
                 </p>
@@ -205,4 +214,13 @@
             }
         }
     </script>
+{% endblock %}
+
+{% block styles %}
+    <style>
+        .experimenter {
+            font-size: 10pt;
+            font-weight: normal;
+        }
+    </style>
 {% endblock %}

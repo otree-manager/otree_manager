@@ -22,7 +22,7 @@
                         {% if instance.deployed %}
                             <i class="big green hdd icon"></i>
                         {% else %}
-                            <i class="big blue hdd icon"></i>
+                            <i class="big orange hdd icon"></i>
                         {% endif %}
                     </p>
                     <p><b>{{ instance.name }}</b></p>
@@ -44,4 +44,17 @@
             </div>
         {% endif %}
     </div>
+{% endblock %}
+
+{% block styles %}
+    <style type="text/css">
+        .oTreeInstance {
+            width: 180px;
+            height: 120px;
+            overflow-wrap: break-word;
+        }
+        .oTreeInstance .icon {
+            margin: 0 !important;
+        }
+    </style>
 {% endblock %}
