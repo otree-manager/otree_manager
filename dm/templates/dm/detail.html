@@ -19,56 +19,89 @@
                         <i class="orange hdd icon"></i> 
                     {% endif %}
                     {{ instance.name }}
-                    <span class="experimenter">
-                        ({{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }})
-                    </span>
                 </h1>
-                <table class="ui very basic compact table">                   
-                    <tbody>
-                        {% if instance.deployed %}
-                            <tr>
-                                <td>URL</td>
-                                <td id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</td>
-                            </tr>
-                        {% else %}
-
-                        {% endif %}
-                        <tr>
-                            <td>Git Repository URL</td>
-                            <td id="git_url">{{ instance.git_url }} </td>
-                        </tr>
-                        <tr>
-                            <td>Git SHA</td>
-                            <td id="git_sha">{{ instance.git_sha }}</td>
-                        </tr>
-
-                        <tr>
-                            <td>Web Dynos</td>
-                            <td id="web_dynos">{{ instance.web_dynos }}</td>
-                        </tr>
-                        <tr>
-                            <td>Worker Dynos</td>
-                            <td id="worker_dynos">{{ instance.worker_dynos }}</td>
-                        </tr>
-                        <tr>
-                            <td>oTree Admin Username</td>
-                            <td id="admin_username">{{ instance.otree_admin_username }}</td>
-                        </tr>
-                        <tr>
-                            <td>oTree Admin Password</td>
-                            <td id="admin_password">{{ instance.otree_admin_password }}</td>
-                        </tr>
-                        <tr>
-                            <td>oTree Auth Level</td>
-                            <td id="auth_level">{{ instance.otree_auth_level }}</td>
-                        </tr>
-                        <tr>
-                            <td>oTree Production</td>
-                            <td id="otree_production">{{ instance.otree_production }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            
+                <div class="ui accordion">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        <b>Git Details</b>
+                    </div>
+                    <div class="content">
+                        <div class="transition hidden">
+                            <table class="ui very basic compact fixed table">                   
+                                <tbody>
+                                    <tr>
+                                        <td class="four wide">Repository URL</td>
+                                        <td class="twelve wide" id="git_url">{{ instance.git_url }} </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Latest Commit</td>
+                                        <td id="git_sha">{{ instance.git_sha }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        <b>oTree Details</b>
+                    </div>
+                    <div class="content">
+                        <div class="transition hidden">
+                            <table class="ui very basic compact fixed table">                   
+                                <tbody>
+                                    <tr>
+                                        <td class="four wide">URL</td>
+                                        <td class="twelve wide" id="url"><a href="{{ instance.url }}" target="_blank">{{ instance.url }}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Username</td>
+                                        <td id="admin_username">{{ instance.otree_admin_username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Password</td>
+                                        <td><span id="password"></span> <a id="password_toggle"><i id="password_toggle_icon" class="eye icon"></i></a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Auth Level</td>
+                                        <td id="auth_level">{{ instance.otree_auth_level }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Production</td>
+                                        <td id="otree_production">{{ instance.otree_production }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        <b>Miscellaneous</b>
+                    </div>
+                    <div class="content">
+                        <div class="transition hidden">
+                            <table class="ui very basic compact fixed table">                   
+                                <tbody>
+                                    <tr>
+                                        <td class="four wide">Experimenter</td>
+                                        <td class="twelve wide">
+                                            {{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Scaling</td>
+                                        <td><span id="web_dynos">{{ instance.web_dynos }}</span>x web, 
+                                            <span id="worker_dynos">{{ instance.worker_dynos }}</span>x worker</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            
+
             <div class="two wide column right aligned">
                 {% if instance.deployed %}
                 <p>
@@ -83,7 +116,7 @@
                     </a>
                 </p>
                 <p>
-                    <a href="{% url 'scale_app' instance_id=instance.id %}" class="ui basic green icon button" data-tooltip="Scale Container"  data-position="left center">
+                    <a href="{% url 'scale_app' instance_id=instance.id %}" class="ui basic green icon button" data-tooltip="Scaling"  data-position="left center">
                         <i class="boxes icon"></i>
                     </a>
                 </p>
@@ -213,6 +246,34 @@
                 }
             }
         }
+
+        var admin_pass = "{{ instance.otree_admin_password }}";
+        var hidden = "";
+        var password_hidden = true;
+
+        for (var i = 0; i < admin_pass.length; i++) {
+            hidden += '∙';
+        }
+
+        $('#password').html(hidden);
+        $('#password_toggle').click(function (e) {
+            if (password_hidden) {
+                $('#password_toggle_icon').addClass('slash');
+                $('#password').html(admin_pass);
+            } else {
+                $('#password_toggle_icon').removeClass('slash');
+                $('#password').html(hidden);
+            }
+            password_hidden = !password_hidden;
+        });
+
+        $('.ui.accordion').accordion({'exclusive': false});
+
+        {% if instance.deployed %}
+            $('.ui.accordion').accordion('open', 1);
+        {% else %}
+            $('.ui.accordion').accordion('open', 0);
+        {% endif %}
     </script>
 {% endblock %}
 
@@ -221,6 +282,9 @@
         .experimenter {
             font-size: 10pt;
             font-weight: normal;
+        }
+        #password_toggle {
+            cursor: pointer;
         }
     </style>
 {% endblock %}

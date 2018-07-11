@@ -10,8 +10,8 @@
 {% endblock %}
 {% block content %}
     <div class="ui form error segment">
-        <h1>Scale Dynos</h1>
-        <p>Typically, one web dyno and one worker dyno are enough for laboratory experiments. If you need more capacity, you can scale up the number of dynos here. Ask your Lab Manager if you are unsure.</p>
+        <h1>Scale Processes</h1>
+        <p>Typically, one web process and one worker process are enough for laboratory experiments. If you need more capacity, you can scale up the number of processes here. Ask your Lab Manager if you are unsure.</p>
         <form method="post">
         {% csrf_token %}
         {% if form.non_field_errors %}
@@ -30,7 +30,7 @@
             {{ form.worker_dynos.label_tag }}
             {{ form.worker_dynos }}
         </div>
-        <button class="ui primary button" type="submit">Change Workers</button>
+        <button class="ui primary button" type="submit">Confirm</button>
     </form>
     </div>
 {% endblock %}
