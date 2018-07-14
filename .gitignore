@@ -4,3 +4,4 @@ keyfiles/*
 tmp/*
 !*/.gitkeep
 venv/
+_static_root/

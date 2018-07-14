@@ -1,0 +1,16 @@
+# install notes
+
+# deb packages:
+python3 redis-server postgresql supervisor nginx
+
+
+
+
+# postgresql
+
+CREATE DATABASE otree_manager;
+CREATE USER otree_manager_user WITH PASSWORD 'supersecure';
+ALTER ROLE otree_manager_user SET client_encoding TO 'utf8';
+ALTER ROLE otree_manager_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE otree_manager_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE otree_manager TO otree_manager_user;
