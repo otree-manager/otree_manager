@@ -16,8 +16,24 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+try:
+    SECRET_KEY
+except NameError:
+    SECRET_FILE = os.path.join(BASE_DIR, 'secret.txt')
+    try:
+        SECRET_KEY = open(SECRET_FILE).read().strip()
+    except IOError:
+        try:
+            import random
+            SECRET_KEY = ''.join([random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+            with open(SECRET_FILE, 'w') as secret:
+                secret.write(SECRET_KEY)
+                secret.close()
+        except IOError:
+            Exception('Please create a %s file with random characters \
+            to generate your secret key!' % SECRET_FILE)
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET', 'insecure')
+#SECRET_KEY = os.environ.get('DJANGO_SECRET', 'insecure')
 
 
 # Quick-start development settings - unsuitable for production
@@ -168,9 +184,9 @@ MAX_WORKERS = 4
 MAX_WEB = 4
 
 # settings for mail
-# EMAIL_HOST = 'localhost'
-# EMAIL_PORT = 1025
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
 # Custom User Model
 AUTH_USER_MODEL = 'om.User'

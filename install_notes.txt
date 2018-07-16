@@ -1,20 +1,63 @@
 # install notes
 
 # deb packages:
-python3 redis-server postgresql supervisor
+apt-get install -y python3 redis-server postgresql supervisor postfix
 
 
+# config smtp server send only, accept local connections
+sed -i '/inet_interfaces = all/c\inet_interfaces = localhost' /etc/postfix/main.cf
+postfix reload
 
+
+# create dir and adjust 
+mkdir /var/opt/otree_manager
+chmod -R root:users /var/opt/otree_manager
 
 
 # postgresql
-
 CREATE DATABASE otree_manager;
 CREATE USER otree_manager_user WITH PASSWORD 'supersecure';
 ALTER ROLE otree_manager_user SET client_encoding TO 'utf8';
 ALTER ROLE otree_manager_user SET default_transaction_isolation TO 'read committed';
 ALTER ROLE otree_manager_user SET timezone TO 'UTC';
 GRANT ALL PRIVILEGES ON DATABASE otree_manager TO otree_manager_user;
+
+
+# /etc/supervisor/conf.d/otree_manager.conf
+[program:otree_manager]
+command=/var/opt/otree_manager/venv/bin/daphne -b 127.0.0.1 -p 8001 dokku_manager.asgi:application
+directory=/var/opt/otree_manager
+stdout_logfile=/var/opt/otree_manager/log/otree_manager-supervisor.log
+stderr_logfile=/var/opt/otree_manager/log/otree_manager-supervisor-errors.log
+autostart=true
+autorestart=true
+    
+[program:otree_manager_worker]
+command=/var/opt/otree_manager/venv/bin/python manage.py runworker dokku_tasks
+directory=/var/opt/otree_manager
+stdout_logfile=/var/opt/otree_manager/log/otree_manager_worker-supervisor.log
+stderr_logfile=/var/opt/otree_manager/log/otree_manager_worker-supervisor-errors.log
+autostart=true
+autorestart=true
+
+
+# /etc/nginx/sites-enabled/otree_manager
+server {
+    listen   80;
+    server_name  localhost;
+
+    location / {
+       	    proxy_pass http://127.0.0.1:8001;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_redirect     off;
+            proxy_set_header   Host $host;
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header   X-Forwarded-Host $server_name;
+        }
+}
 
 
 
