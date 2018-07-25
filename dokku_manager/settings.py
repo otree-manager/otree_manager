@@ -173,7 +173,7 @@ SECURE_SSL_REDIRECT = False
 X_FRAME_OPTIONS = "DENY"
 
 # settings for the login / auth system
-LOGIN_URL = '/login/'
+LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 DOKKU_DOMAIN = "localhost"
 DOKKU_BASE = "/home/dokku"

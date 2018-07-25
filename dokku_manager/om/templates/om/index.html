@@ -11,13 +11,13 @@
 {% endblock %}
 
 {% block content %}
-    {% if not instances %}
+    {% if not instances and not request.user.is_superuser %}
         <p align="center">You have not been assigend any oTree containers.<br/>Ask your Lab Manager to create one for you.</p>
     {% endif %}
     <div class="ui centered stackable grid">
         {% for instance in instances %}
             <div class="four wide column">
-                <a class="ui basic button oTreeInstance" href="detail/{{ instance.id }}">
+                <a class="ui basic button oTreeInstance" href="{% url 'detail' instance_id=instance.id %}">
                     <p>
                         {% if instance.deployed %}
                             <i class="big green hdd icon"></i>
@@ -32,7 +32,7 @@
         {% endfor %}
         {% if perms.is_admin %}
             <div class="four wide column">
-                <a class="ui basic button oTreeInstance" href="/new_app">
+                <a class="ui basic button oTreeInstance" href="{% url 'new_app' %}">
                     <p>
                         <i class="big icons">
                             <i class="hdd icon"></i>

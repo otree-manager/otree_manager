@@ -83,6 +83,7 @@ class oTreeInstance(models.Model):
     otree_admin_password = models.CharField(max_length=200, blank=True)
     otree_auth_level = models.CharField(max_length=200, blank=True)
     otree_production = models.IntegerField(null=True, blank=True)
+    otree_room_name = models.CharField(max_length=200, blank=True)
 
     web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
                                        MaxValueValidator(settings.MAX_WEB)], default=1)
@@ -97,7 +98,18 @@ class oTreeInstance(models.Model):
         return git_url
 
     def url(self):
-        return "http://%s.%s" % (self.name, settings.DOKKU_DOMAIN)
+        return "http://%s.%s/" % (self.name, settings.DOKKU_DOMAIN)
+
+    def participant_label_valid(self, participant_label):
+        # needs fixing
+        return True
+
+    def get_room_url(self):
+        if not self.otree_room_name:
+            return None
+
+        room_url = "%sroom/%s/" % (self.url(), self.otree_room_name)
+        return room_url
 
     def refresh_from_dokku(self, user_id):
         async_to_sync(channel_layer.send)(

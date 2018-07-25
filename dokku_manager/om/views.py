@@ -24,6 +24,26 @@ def index(request):
     context = { 'instances': show_instances, 'user': request.user }
     return render(request, 'om/index.html', context)
 
+def lobby(request, instance_name, participant_label):
+    try:
+        inst = oTreeInstance.objects.get(name=instance_name)
+    except oTreeInstance.DoesNotExist:
+        return render(request, 'om/lobby.html', { 'redirect_url': '' })
+
+    if not inst.deployed:
+        return render(request, 'om/lobby.html', { 'redirect_url': '', 'error_msg': 'oTree not deployed' })
+
+    room_url = inst.get_room_url()
+    if not room_url:
+        return render(request, 'om/lobby.html', { 'redirect_url': '', 'error_msg': 'invalid room name' })
+
+    if not inst.participant_label_valid(participant_label):
+        return render(request, 'om/lobby.html', { 'redirect_url': '', 'error_msg': 'invalid participant label' }) 
+
+
+    redirect_url = "%s?participant_label=%s" % (room_url, participant_label)
+    return render(request, 'om/lobby.html', { 'redirect_url': redirect_url, 'error_msg': None })
+
 
 @login_required
 def change_key_file(request):
@@ -39,7 +59,7 @@ def change_key_file(request):
     return render(request, 'om/change_key_file.html', context)
 
 @login_required
-@permission_required('om.add_otreeinstance', login_url='/login/', raise_exception=True)
+@permission_required('om.add_otreeinstance', login_url='user/login/', raise_exception=True)
 def new_app(request):
     if request.method == 'POST':
         # handle data posted
@@ -100,7 +120,7 @@ def scale_app(request, instance_id):
     return render(request, 'om/scale_app.html', {'form': form, 'instance_id':instance_id})
 
 @login_required
-@permission_required('om.add_users', login_url='login', raise_exception=True)
+@permission_required('om.add_users', login_url='user/login/', raise_exception=True)
 def new_user(request):
     if request.method == 'POST':
         form = Add_User_Form(request.POST)

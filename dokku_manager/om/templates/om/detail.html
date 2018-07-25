@@ -210,7 +210,7 @@
                 onApprove: function () {
                     $(".ui.approve.button").addClass('loading');
                     $(".ui.deny.button").addClass("disabled");
-                    window.location.href = "/delete/{{ instance.id }}";
+                    window.location.href = "{% url 'delete' instance_id=instance.id %}";
                     return false;
                 },
                 closable: false,
@@ -221,7 +221,7 @@
                 onApprove: function () {
                     $(".ui.approve.button").addClass('loading');
                     $(".ui.deny.button").addClass("disabled");
-                    window.location.href = "/restart/{{ instance.id }}";
+                    window.location.href = "{% url 'restart' instance_id=instance.id %}";
                     return false;
                 },
                 closable: false,
@@ -232,7 +232,7 @@
                 onApprove: function () {
                     $(".ui.approve.button").addClass('loading');
                     $(".ui.deny.button").addClass("disabled");
-                    window.location.href = "/reset_database/{{ instance.id }}";
+                    window.location.href = "{% url 'reset_database' instance_id=instance.id %}";
                     return false;
                 },
                 closable: false,

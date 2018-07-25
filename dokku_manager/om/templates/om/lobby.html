@@ -1,0 +1,54 @@
+{% load static %}
+<!doctype html>
+<html>
+    <head>
+        <link rel='stylesheet' type='text/css' href='{% static 'om/semantic.min.css' %}'>
+        <script type='text/javascript' src='{% static 'om/jquery-3.3.1.min.js' %}'></script>
+        <script type='text/javascript' src='{% static 'om/semantic.min.js' %}'></script>
+        <script type='text/javascript' src='{% static 'channels/js/websocketbridge.js' %}'></script>
+
+        <style type='text/css'>
+            .ui.container {
+                margin-top: 50px;
+            }
+            #notifications_container {
+                position: fixed;
+                bottom: 35px;
+                left: 50%;
+                width: 80%;
+                margin-bottom: 5px;
+                transform: translate(-50%, 0%);
+            }
+            .hidden {
+                visibility: hidden;
+            }
+
+            #footer {
+                position: fixed;
+                bottom: 5px;
+                width: 100%;
+                padding-right: 5px;
+                padding-left: 5px;
+                text-align: right;
+            }
+            .ui.menu {
+                border-radius: 0px !important;
+                -webkit-box-shadow: none !important;
+                box-shadow: none !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="ui container">
+            <div class="ui center aligned segment">
+                {% if error_msg %}
+                    <p>{{ error_msg }}</p>
+                {% else %}
+                    <h1>Welcome</h1>
+                    <p>Please click the button below.</p>
+                    <a class="ui primary button" href="{{ redirect_url }}">I am ready!</a>
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>
