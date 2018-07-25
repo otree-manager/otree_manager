@@ -38,6 +38,11 @@
                 {{ form.email.label_tag }}
                 {{ form.email }}
             </div>
+            <div class="field">
+                {{ form.is_superuser.errors }}
+                {{ form.is_superuser.label_tag }}
+                {{ form.is_superuser }}
+            </div>
             <button class="ui primary button" type="submit">Create</button>
         </form>
     </div>

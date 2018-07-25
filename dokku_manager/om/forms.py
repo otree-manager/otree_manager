@@ -122,15 +122,9 @@ class Add_User_Form(forms.ModelForm):
     A form that creates a user, with no privileges, from the given username
     """
 
-    role = forms.ChoiceField(
-        label="Role",
-        choices=ROLES,
-        initial=1,
-    )
-
     class Meta:
         model = UserModel
-        fields = (UserModel.USERNAME_FIELD, 'first_name', 'last_name', 'email')
+        fields = (UserModel.USERNAME_FIELD, 'first_name', 'last_name', 'email', 'is_superuser')
         field_classes = {UserModel.USERNAME_FIELD: UsernameField}
 
     # def __init__(self, *args, **kwargs):
