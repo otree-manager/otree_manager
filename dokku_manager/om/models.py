@@ -64,12 +64,6 @@ class User(AbstractUser):
 
 
 class oTreeInstance(models.Model):
-    class Meta:
-        permissions = (
-            ('can_restart', "Can restart the oTree instance"),
-            ('can_reset', "Can reset otree database"),
-        )
-
     name = models.CharField(
         max_length=32, 
         validators=[

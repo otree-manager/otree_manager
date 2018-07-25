@@ -131,7 +131,7 @@
                         <i class="database icon"></i>
                     </a>
                 </p>
-                {% if permissions.is_admin %}
+                {% if request.user.is_superuser %}
                     <p>
                         <a id="delete_button" class="ui grey basic button icon" data-tooltip="Delete"  data-position="left center">
                             <i class="trash icon"></i>

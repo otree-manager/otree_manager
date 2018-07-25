@@ -38,17 +38,6 @@
                 {{ form.email.label_tag }}
                 {{ form.email }}
             </div>
-            <div class="field">
-                {{ form.role.errors }}
-                {{ form.role.label_tag }}
-                <select class="ui search dropdown" id="id_role" name="role">
-                    <i class="dropdown icon"></i>
-                    {% for choice in form.role %}
-                        {{ choice }}
-                    {% endfor %}
-                </select>
-                
-            </div>
             <button class="ui primary button" type="submit">Create</button>
         </form>
     </div>

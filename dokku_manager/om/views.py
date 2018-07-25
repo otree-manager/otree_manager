@@ -12,37 +12,16 @@ from .models import oTreeInstance, User
 from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password, Change_Scaling_Form, Change_Key_Form
 
 
-
-def get_permissions(user, instance=None):
-    if instance != None:
-        can_view = (instance.owned_by == user) or user.groups.filter(name='Admins').exists()
-    else:
-        can_view = False
-
-    perms = {
-        'can_view': can_view,
-        'can_restart': user.has_perm('dm.can_restart'),
-        'can_delete': user.has_perm('dm.can_delete'),
-        'can_add_user': user.has_perm('dm.add_users'),
-        'can_add_instance': user.has_perm('dm.add_otreeinstance'),
-        'can_reset': user.has_perm('dm.can_reset'),
-        'is_admin': user.groups.filter(name='Admins').exists(),
-    }
-
-    return perms
-
-
 @login_required
 def index(request):
     if not request.user.public_key_set:
         return HttpResponseRedirect(reverse('change_key_file'))
 
-    if request.user.groups.filter(name='Admins').exists():
+    if request.user.is_superuser:
         show_instances = oTreeInstance.objects.order_by('-deployed', '-name').all()
     else:
         show_instances = oTreeInstance.objects.filter(owned_by=request.user).order_by('-deployed', '-name')
-    perms = get_permissions(request.user)
-    context = { 'instances': show_instances, 'permissions': perms, 'user': request.user }
+    context = { 'instances': show_instances, 'user': request.user }
     return render(request, 'om/index.html', context)
 
 
@@ -147,13 +126,12 @@ def detail(request, instance_id=None):
         return HttpResponseRedirect(reverse('index'))
 
     inst = oTreeInstance.objects.get(id=instance_id)
-    perms = get_permissions(request.user, inst)
-    if not perms['can_view']:
+    if not inst.owned_by == request.user and not request.user.is_superuser:
         return HttpResponseRedirect(reverse('index'))
 
     inst.refresh_from_dokku(request.user.id)
 
-    return render(request, 'om/detail.html', {'instance': inst, 'permissions': perms })
+    return render(request, 'om/detail.html', {'instance': inst })
 
 
 @login_required
@@ -163,8 +141,7 @@ def delete(request, instance_id=None):
 
     
     inst = oTreeInstance.objects.get(id=instance_id)
-    perms = get_permissions(request.user, inst)
-    if not perms['can_delete']:
+    if not request.user.is_superuser:
         return HttpResponseRedirect(reverse('index'))
     print('try destroy')
     inst.destroy_dokku_app(request.user.id)
@@ -191,8 +168,8 @@ def reset_database(request, instance_id=None):
         return HttpResponseRedirect(reverse('index'))
 
     inst = oTreeInstance.objects.get(id=instance_id)
-    perms = get_permissions(request.user, inst)
-    if not perms['can_reset']:
+
+    if not request.user.is_superuser and not inst.owned_by == request.user:
         return HttpResponseRedirect(reverse('index'))
 
     print('otree database reset')
@@ -206,8 +183,7 @@ def restart_app(request, instance_id=None):
         return HttpResponseRedirect(reverse('index'))
 
     inst = oTreeInstance.objects.get(id=instance_id)
-    perms = get_permissions(request.user, inst)
-    if not perms['can_restart']:
+    if not request.user.is_superuser and not inst.owned_by == request.user:
         return HttpResponseRedirect(reverse('index'))
 
     print('restart app')

@@ -96,18 +96,18 @@ ASGI_APPLICATION = 'dokku_manager.routing.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    #'default': {
-    #    'ENGINE': 'django.db.backends.sqlite3',
-    #    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    #},
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'otree_manager',
-        'USER': 'otree_manager_user',
-        'PASSWORD': 'supersecure',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'otree_manager',
+    #     'USER': 'otree_manager_user',
+    #     'PASSWORD': 'supersecure',
+    #     'HOST': 'localhost',
+    #     'PORT': '',
+    # }
 }
 
 
@@ -184,9 +184,9 @@ MAX_WORKERS = 4
 MAX_WEB = 4
 
 # settings for mail
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 25
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
 # Custom User Model
 AUTH_USER_MODEL = 'om.User'

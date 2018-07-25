@@ -139,15 +139,6 @@ class Add_User_Form(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(get_random_string())
-        user.save()
-
-        if self.cleaned_data.get("role") == 2:
-            admin_group = Group.objects.get(name='Admins')
-            user.groups.add(admin_group)
-
-        # default to experimenter group
-        experimenter_group = Group.objects.get(name='Experimenters')
-        user.groups.add(experimenter_group)
 
         if commit:
             user.save()
