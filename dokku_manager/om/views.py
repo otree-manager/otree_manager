@@ -9,7 +9,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.forms import PasswordResetForm
 
 from .models import oTreeInstance, User
-from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password, Change_Scaling_Form, Change_Key_Form
+from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password, Change_Scaling_Form, Change_Key_Form, Edit_User_Form
 
 
 @login_required
@@ -118,6 +118,31 @@ def new_user(request):
     else:
         form = Add_User_Form()
     return render(request, 'om/new_user.html', {'form': form})
+
+@login_required
+def edit_user(request, user_id):
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('index'))
+
+    user_inst = User.objects.get(id=user_id)
+    form = Edit_User_Form(request.POST or None, instance = user_inst)
+
+    instances = oTreeInstance.objects.filter(owned_by=user_inst)
+
+    if request.method == "POST":
+        if form.is_valid():
+            user = form.save()
+            return HttpResponseRedirect(reverse('list_users'))
+
+    return render(request, 'om/edit_user.html', { 'form': form, 'containers': instances })
+
+@login_required
+def list_users(request):
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('index'))
+    else:
+        user_list = User.objects.all().order_by('last_name')
+        return render(request, 'om/list_users.html', { 'user_list': user_list })
 
 
 @login_required

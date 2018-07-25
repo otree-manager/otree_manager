@@ -28,6 +28,14 @@ error_messages = {
     'invalid_file': _("The file is not a valid rsa public key file."),
 }
 
+class Edit_User_Form(forms.ModelForm):
+    class Meta:
+        model = UserModel
+        fields = ['username', 'first_name', 'last_name', 'email', 'is_superuser']
+
+    pass
+
+
 class Change_Key_Form(forms.ModelForm):
     class Meta:
         model = UserModel

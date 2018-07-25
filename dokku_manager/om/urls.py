@@ -12,7 +12,9 @@ urlpatterns = [
     path('login/', auth_views.login, { 'template_name': 'om/login.html' }, name='login'),
     path('logout/', auth_views.logout, {'template_name': 'om/logout.html' }, name="logout"),
 
-    path('new_user/', views.new_user, name='new_user'),
+    path('user/list/', views.list_users, name="list_users"),
+    path('user/edit/<int:user_id>', views.edit_user, name="edit_user"),
+    path('user/new/', views.new_user, name='new_user'),
     path('change_key_file/', views.change_key_file, name='change_key_file'),
 
     path('password_reset/', auth_views.password_reset, {'template_name': 'om/password_reset.html' }, name='password_reset'),
