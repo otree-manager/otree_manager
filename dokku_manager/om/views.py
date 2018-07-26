@@ -9,7 +9,15 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.forms import PasswordResetForm
 
 from .models import oTreeInstance, User
-from .forms import Add_New_Instance_Form, Add_User_Form, Change_OTree_Password, Change_Scaling_Form, Change_Key_Form, Edit_User_Form
+from .forms import (
+    Add_New_Instance_Form, 
+    Add_User_Form, 
+    Change_OTree_Password, 
+    Change_Scaling_Form, 
+    Change_Key_Form, 
+    Edit_User_Form,
+    Change_Room_Form
+)
 
 
 @login_required
@@ -114,10 +122,20 @@ def scale_app(request, instance_id):
             user = form.save()
             return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
 
-        else:
-            form = Change_Scaling_Form(request.POST)
-
     return render(request, 'om/scale_app.html', {'form': form, 'instance_id':instance_id})
+
+
+@login_required
+def change_otree_room(request, instance_id):
+    inst = oTreeInstance.objects.get(id=instance_id)
+    form = Change_Room_Form(request.POST or None, request.FILES or None, instance = inst)
+    if request.method == 'POST':
+        if form.is_valid():
+            inst = form.save()
+            return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
+
+    return render(request, 'om/change_otree_room.html', { 'form': form })
+
 
 @login_required
 @permission_required('om.add_users', login_url='user/login/', raise_exception=True)
@@ -176,7 +194,9 @@ def detail(request, instance_id=None):
 
     inst.refresh_from_dokku(request.user.id)
 
-    return render(request, 'om/detail.html', {'instance': inst })
+    plabel = ", ".join(inst.get_participant_labels())
+
+    return render(request, 'om/detail.html', {'instance': inst, 'otree_participant_labels': plabel })
 
 
 @login_required

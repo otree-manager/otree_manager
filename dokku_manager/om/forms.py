@@ -23,9 +23,10 @@ _ = gettext.gettext
 
 error_messages = {
     'password_mismatch': _("The two password fields didn't match."),
-    'keyfile_size': _("The file is too large (max 1kb)."),
+    'file_size': _("The file is too large (max 1kb)."),
     'keyfile_pattern': _("The file seems to have a non-standard pattern."),
     'invalid_file': _("The file is not a valid rsa public key file."),
+    'no_labels': _("Could not read labels from file."),
 }
 
 class Edit_User_Form(forms.ModelForm):
@@ -34,6 +35,41 @@ class Edit_User_Form(forms.ModelForm):
         fields = ['username', 'first_name', 'last_name', 'email', 'is_superuser']
 
     pass
+
+class Change_Room_Form(forms.ModelForm):
+    labels_file = forms.FileField()
+
+    class Meta:
+        model = oTreeInstance
+        fields = ['otree_room_name', 'labels_file']
+
+    def clean_labels_file(self):
+        participant_label_file = self.cleaned_data.get('labels_file', False)
+        print(participant_label_file)
+
+        if participant_label_file.size > 1024:
+            raise forms.ValidationError(error_messages['file_size'], code="invalid file")
+
+
+        if not participant_label_file:
+            raise forms.ValidationError(error_messages['no_labels'], code="invalid file")
+
+
+        return participant_label_file
+
+
+    def save(self, commit=True):
+        inst = super().save()
+
+        labels = []
+        for line in self.cleaned_data.get('labels_file', []):
+            label = line.decode('utf-8').strip()
+            if label:
+                labels.append(label)
+
+        inst.set_participant_labels(labels)
+        return inst
+
 
 
 class Change_Key_Form(forms.ModelForm):
@@ -46,7 +82,7 @@ class Change_Key_Form(forms.ModelForm):
         
         # reject files over 1kb
         if public_key_file.size > 1024:
-            raise forms.ValidationError(error_messages['keyfile_size'], code="invalid file")
+            raise forms.ValidationError(error_messages['file_size'], code="invalid file")
 
         # check against regular expression first (quick and dirty)
         content = public_key_file.read().decode('utf-8')

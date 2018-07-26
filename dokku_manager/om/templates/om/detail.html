@@ -49,7 +49,7 @@
                     </div>
                     <div class="content">
                         <div class="transition hidden">
-                            <table class="ui very basic compact fixed table">                   
+                            <table class="ui very basic compact fixed single line table">                   
                                 <tbody>
                                     <tr>
                                         <td class="four wide">URL</td>
@@ -70,6 +70,14 @@
                                     <tr>
                                         <td>Production</td>
                                         <td id="otree_production">{{ instance.otree_production }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Room Name</td>
+                                        <td id="otree_room">{{ instance.otree_room_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Participant Labels</td>
+                                        <td id="otree_participant_labels">{{ otree_participant_labels }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -114,6 +122,11 @@
                 <p>
                     <a href="{% url 'change_otree_password' instance_id=instance.id %}" class="ui basic orange icon button" data-tooltip="Change Admin Password"  data-position="left center">
                         <i class="edit icon"></i>
+                    </a>
+                </p>
+                <p>
+                    <a href="{% url 'change_otree_room' instance_id=instance.id %}" class="ui basic pink icon button" data-tooltip="Setup Room"  data-position="left center">
+                        <i class="desktop icon"></i>
                     </a>
                 </p>
                 <p>

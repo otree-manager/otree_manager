@@ -13,6 +13,7 @@ from asgiref.sync import async_to_sync
 import string
 import random
 import os
+import json
 
 channel_layer = get_channel_layer()
 
@@ -84,6 +85,7 @@ class oTreeInstance(models.Model):
     otree_auth_level = models.CharField(max_length=200, blank=True)
     otree_production = models.IntegerField(null=True, blank=True)
     otree_room_name = models.CharField(max_length=200, blank=True)
+    otree_participant_labels = models.TextField(blank=True)
 
     web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
                                        MaxValueValidator(settings.MAX_WEB)], default=1)
@@ -93,6 +95,13 @@ class oTreeInstance(models.Model):
     def __str__(self):
         return self.name
 
+    def set_participant_labels(self, participant_label_list):
+        self.otree_participant_labels = json.dumps(participant_label_list)
+        self.save()
+
+    def get_participant_labels(self):
+        return json.loads(self.otree_participant_labels)
+
     def git_url(self):
         git_url = "dokku@%s:%s" % (settings.DOKKU_DOMAIN, self.name)
         return git_url
@@ -101,8 +110,7 @@ class oTreeInstance(models.Model):
         return "http://%s.%s/" % (self.name, settings.DOKKU_DOMAIN)
 
     def participant_label_valid(self, participant_label):
-        # needs fixing
-        return True
+        return participant_label in self.get_participant_labels()
 
     def get_room_url(self):
         if not self.otree_room_name:
@@ -208,6 +216,8 @@ class oTreeInstance(models.Model):
                 "var_dict": env_vars_dict
             },
         )
+
+        self.reset_database(user_id)
 
 
     def reset_database(self, user_id):

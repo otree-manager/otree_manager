@@ -36,4 +36,5 @@ urlpatterns = [
     path('app/otree/reset_password/<int:instance_id>', views.reset_otree_password, name="reset_otree_password"),
     path('app/otree/change_password/<int:instance_id>', views.change_otree_password, name="change_otree_password"),
     path('app/otree/reset_database/<int:instance_id>', views.reset_database, name="reset_database"),
+    path('app/otree/change_room/<int:instance_id>', views.change_otree_room, name="change_otree_room"),
 ]

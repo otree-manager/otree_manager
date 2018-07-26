@@ -219,6 +219,7 @@ class Dokku_Tasks(SyncConsumer):
 
 
     def set_env(self, event):
+        print('received set env command')
         cmd = ['dokku', '--quiet', 'config:set', event["instance_name"]]
     
         for key, value in event["var_dict"].items():
