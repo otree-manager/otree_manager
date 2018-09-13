@@ -245,10 +245,10 @@ def delete_user(request, user_id):
     if not delete_ok:
         return HttpResponseRedirect(reverse('edit_user', args=(user_id,)))
     else:
+        user_inst.remove_public_key()
         user_inst.delete()
 
     return HttpResponseRedirect(reverse('list_users'))
-
 
 
 @login_required

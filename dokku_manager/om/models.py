@@ -34,20 +34,23 @@ class User(AbstractUser):
     public_key_set = models.BooleanField(default=False)
     public_key_file = models.FileField(upload_to=path_and_filename)
 
+    def remove_public_key(self):
+        async_to_sync(channel_layer.send)(
+            "dokku_tasks",
+            {
+                "type": "user.remove.key",
+                "user_id": self.id,
+                "user_name": self.username,
+                "user_verbose_name": self.__str__(),
+            },
+        )
+        self.public_key_set = False
+        self.save()  
+
+
     def set_public_key(self):
         if self.public_key_set:
-            # remove key
-            async_to_sync(channel_layer.send)(
-                "dokku_tasks",
-                {
-                    "type": "user.remove.key",
-                    "user_id": self.id,
-                    "user_name": self.username,
-                    "user_verbose_name": self.__str__(),
-                },
-            )
-            self.public_key_set = False
-            self.save()   
+            self.remove_public_key() 
 
         async_to_sync(channel_layer.send)(
             "dokku_tasks",

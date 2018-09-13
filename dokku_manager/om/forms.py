@@ -122,6 +122,8 @@ class Add_New_Instance_Form(forms.ModelForm):
         model = oTreeInstance
         fields = ['name', 'owned_by']
 
+        # needs checks for valid names!
+
 
 class Change_OTree_Password(forms.ModelForm):
     password_2 = forms.CharField(label="Password confirmation", max_length="100", widget=forms.PasswordInput())
