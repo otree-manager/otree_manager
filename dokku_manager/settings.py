@@ -176,6 +176,7 @@ X_FRAME_OPTIONS = "DENY"
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 DOKKU_DOMAIN = "localhost"
+BASE_URL = "http://localhost:8080"
 DOKKU_BASE = "/home/dokku"
 
 # scaling

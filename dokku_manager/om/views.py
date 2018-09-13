@@ -52,6 +52,14 @@ def lobby(request, instance_name, participant_label):
     redirect_url = "%s?participant_label=%s" % (room_url, participant_label)
     return render(request, 'om/lobby.html', { 'redirect_url': redirect_url, 'error_msg': None })
 
+def lobby_overview(request, instance_name):
+    try:
+        inst = oTreeInstance.objects.get(name=instance_name)
+    except oTreeInstance.DoesNotExist:
+        return render(request, 'om/lobby.html', { 'redirect_url': '' })
+
+    return render(request, 'om/lobby_overview.html', { 'instance': inst, 'participant_labels': inst.get_participant_labels() })
+
 
 @login_required
 def change_key_file(request):
@@ -196,7 +204,10 @@ def detail(request, instance_id=None):
 
     plabel = ", ".join(inst.get_participant_labels())
 
-    return render(request, 'om/detail.html', {'instance': inst, 'otree_participant_labels': plabel })
+    lurl = inst.get_lobby_url()
+    lurl = lurl if lurl is not None else ""
+
+    return render(request, 'om/detail.html', {'instance': inst, 'otree_participant_labels': plabel, 'lobby_url': lurl })
 
 
 @login_required

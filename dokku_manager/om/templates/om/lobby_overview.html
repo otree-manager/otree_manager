@@ -1,0 +1,42 @@
+{% load static %}
+<!doctype html>
+<html>
+    <head>
+        <link rel='stylesheet' type='text/css' href='{% static 'om/semantic.min.css' %}'>
+        <script type='text/javascript' src='{% static 'om/jquery-3.3.1.min.js' %}'></script>
+        <script type='text/javascript' src='{% static 'om/semantic.min.js' %}'></script>
+
+        <style type='text/css'>
+            .ui.container {
+                margin-top: 50px;
+            }
+            .seat {
+                width: 150px;
+                height: 80px;
+                overflow-wrap: break-word;
+            }
+            .seat .icon {
+                margin: 0 !important;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="ui container">
+            <h1>Lobby Overview</h1>
+            <h2>{{ instance.name }} - {{ instance.otree_room_name}}</h2>
+            <div class="ui centered stackable five column grid">
+                {% for label in participant_labels %}
+                    <div class="column">
+                        <a class="ui basic button seat" href="{% url 'lobby' instance_name=instance.name participant_label=label %}">
+                            <p>
+                                <i class="big blue desktop icon"></i>                            
+                            </p>
+                            <p><b>{{ label }}</b></p>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </body>
+</html>

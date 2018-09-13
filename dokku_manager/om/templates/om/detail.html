@@ -45,7 +45,7 @@
                     </div>
                     <div class="title">
                         <i class="dropdown icon"></i>
-                        <b>oTree Details</b>
+                        <b>oTree Admin Details</b>
                     </div>
                     <div class="content">
                         <div class="transition hidden">
@@ -71,13 +71,40 @@
                                         <td>Production</td>
                                         <td id="otree_production">{{ instance.otree_production }}</td>
                                     </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        <b>oTree Room Details</b>
+                    </div>
+                    <div class="content">
+                        <div class="transition hidden">
+                            <table class="ui very basic compact fixed single line table">                   
+                                <tbody>
                                     <tr>
-                                        <td>Room Name</td>
-                                        <td id="otree_room">{{ instance.otree_room_name }}</td>
+                                        <td class="four wide">Room Name</td>
+                                        <td class="twelve wide" id="otree_room">{{ instance.otree_room_name }}</td>
                                     </tr>
                                     <tr>
                                         <td>Participant Labels</td>
                                         <td id="otree_participant_labels">{{ otree_participant_labels }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lobby URL</td>
+                                        <td id="otree_room_lobby"><a href="{{ lobby_url }}" target="_blank">{{ lobby_url }}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Download Lobby Shortcuts</td>
+                                        <td id="otree_lobby_shortcuts">
+                                            Chrome:
+                                            <a href="#" target="_blank"><i class="black bordered windows link icon"></i></a> 
+                                            <a href="#" target="_blank"><i class="black bordered apple link icon"></i></a>
+                                            Chromium: 
+                                            <a href="#" target="_blank"><i class="black bordered linux link icon"></i></a>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -130,11 +157,6 @@
                     </a>
                 </p>
                 <p>
-                    <a href="{% url 'scale_app' instance_id=instance.id %}" class="ui basic green icon button" data-tooltip="Scaling"  data-position="left center">
-                        <i class="boxes icon"></i>
-                    </a>
-                </p>
-                <p>
                     <a id="restart_button" class="ui purple basic icon button" data-tooltip="Restart"  data-position="left center">
                         <i class="redo alternate icon"></i>
                     </a>
@@ -145,6 +167,11 @@
                     </a>
                 </p>
                 {% if request.user.is_superuser %}
+                    <p>
+                        <a href="{% url 'scale_app' instance_id=instance.id %}" class="ui basic green icon button" data-tooltip="Scaling"  data-position="left center">
+                            <i class="boxes icon"></i>
+                        </a>
+                    </p>
                     <p>
                         <a id="delete_button" class="ui grey basic button icon" data-tooltip="Delete"  data-position="left center">
                             <i class="trash icon"></i>
@@ -287,6 +314,10 @@
             $('.ui.accordion').accordion('open', 1);
         {% else %}
             $('.ui.accordion').accordion('open', 0);
+        {% endif %}
+
+        {% if instance.otree_room_name %}
+            $('.ui.accordion').accordion('open', 2);
         {% endif %}
     </script>
 {% endblock %}

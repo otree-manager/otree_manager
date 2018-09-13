@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('imprint/', views.imprint, name='imprint'),
     path('privacy/', views.privacy, name='privacy'),
+    path('lobby/<str:instance_name>/', views.lobby_overview, name="lobby_overview"),
     path('lobby/<str:instance_name>/<str:participant_label>/', views.lobby, name="lobby"),
 
     path('user/login/', auth_views.login, { 'template_name': 'om/login.html' }, name='login'),
