@@ -62,6 +62,55 @@ def lobby_overview(request, instance_name):
 
 
 @login_required
+def download_shortcuts(request):
+    def gen_shortcut(label, os):
+        arguments = "--kiosk --app="
+        url = "http://www.spiegel.de#"
+        shebang = "#!/bin/bash"
+
+        if os == "mac":
+            browser_path = "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+
+            content = "%s \n\n %s %s%s%s" % (shebang, browser_path, arguments, url, label)
+            filename = "client_%s.command" % label
+
+        if os == "win":
+            browser_path = "start chrome.exe"
+
+            content = "%s %s%s%s" % (browser_path, arguments, url, label)
+            filename = "client_%s.bat" % label
+
+        if os == "linux":
+            filename = "client_%s.sh" % label
+            chromium_cmd = "/usr/bin/chromium %s%s%s" % (arguments, url, label)
+            chrome_cmd = "/usr/bin/google-chrome %s%s%s" % (arguments, url, label)
+
+            content = """%s
+if [ -f /usr/bin/chromium ]; then
+    %s
+elif [ -f /usr/bin/google-chrome ]; then
+    %s
+else
+    echo "Chromium and google chome could not be found at /usr/bin/*"
+fi
+""" % (shebang, chromium_cmd, chrome_cmd)
+
+        return (filename, content)
+
+    def zip_shortcuts(participant_labels, os):
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w') as zip:
+            for label in participant_labels:
+                filename, content = gen_shortcut(label, os)
+                zip_info = zipfile.ZipInfo(filename, date_time=time.localtime())
+                zip_info.external_attr = 0o100755 << 16
+                zip.writestr(zip_info, content)
+
+        return zip_buffer
+
+    pass
+
+@login_required
 def change_key_file(request):
     if request.method == 'POST':
         form = Change_Key_Form(request.POST or None, request.FILES or None, instance=request.user)
