@@ -47,7 +47,12 @@
                 {{ form.is_superuser }}
             </div>
             
-            <button class="ui primary button" type="submit">Save</button>
+            <button class="ui primary button" type="submit">Save</button> 
+            {% if delete_ok %}
+                <a id="delete_button" class="ui red basic button">
+                    Delete User
+                </a>
+            {% endif %}
         </form>
     </div>
     {% if containers %}
@@ -78,11 +83,43 @@
             </div>
         </div>
     {% endif %}
+
+
+    <div class="ui basic modal" id="delete_modal">
+        <div class="ui icon header">
+            <i class="trash icon"></i>
+            Delete User
+        </div>
+        <div class="content">
+            <p style="text-align: center;">Are you sure you want to delete this user?</p>
+        </div>
+        <div class="actions">
+            <div class="ui red inverted deny button">
+                <i class="remove icon"></i>
+                No
+            </div>
+            <div class="ui inverted basic approve button">
+                <i class="checkmark icon"></i>
+                Yes
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
     <script type="text/javascript">
         $('.ui.accordion').accordion({'exclusive': false})
+        $("#delete_button").click(function () {
+            $("#delete_modal").modal('setting', {
+                onApprove: function () {
+                    $(".ui.approve.button").addClass('loading');
+                    $(".ui.deny.button").addClass("disabled");
+                    window.location.href = "{% url 'delete_user' user_id=user.id %}";
+                    return false;
+                },
+                closable: false,
+            }).modal('show');
+        });
     </script>
 {% endblock %}
 

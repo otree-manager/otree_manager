@@ -17,6 +17,7 @@ urlpatterns = [
 
     path('user/new/', views.new_user, name='new_user'),
     path('user/list/', views.list_users, name="list_users"),
+    path('user/delete/<int:user_id>', views.delete_user, name="delete_user"),
     path('user/edit/<int:user_id>', views.edit_user, name="edit_user"),
     path('user/edit/keyfile/', views.change_key_file, name='change_key_file'),
     path('user/password/reset/', auth_views.password_reset, {'template_name': 'om/password_reset.html' }, name='password_reset'),

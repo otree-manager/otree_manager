@@ -225,10 +225,31 @@ def new_user(request):
                 subject_template_name='om/emails/user_registration_subject.txt',
                 email_template_name='om/emails/user_registration.html',
             )
-            return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse('list_users'))
     else:
         form = Add_User_Form()
     return render(request, 'om/new_user.html', {'form': form})
+
+@login_required
+@permission_required('om.delete_users', login_url='user/login/', raise_exception=True)
+def delete_user(request, user_id):
+    if not request.user.is_superuser:
+        return HttpResponseRedirect(reverse('index'))
+
+    user_inst = User.objects.get(id=user_id) 
+    user_count = User.objects.all().count()
+    instances = oTreeInstance.objects.filter(owned_by=user_inst)
+
+    delete_ok = user_count > 1 and instances.count() == 0 and user_inst != request.user
+
+    if not delete_ok:
+        return HttpResponseRedirect(reverse('edit_user', args=(user_id,)))
+    else:
+        user_inst.delete()
+
+    return HttpResponseRedirect(reverse('list_users'))
+
+
 
 @login_required
 def edit_user(request, user_id):
@@ -236,16 +257,19 @@ def edit_user(request, user_id):
         return HttpResponseRedirect(reverse('index'))
 
     user_inst = User.objects.get(id=user_id)
+    user_count = User.objects.all().count()
     form = Edit_User_Form(request.POST or None, instance = user_inst)
 
     instances = oTreeInstance.objects.filter(owned_by=user_inst)
+
+    delete_ok = user_count > 1 and instances.count() == 0 and user_inst != request.user
 
     if request.method == "POST":
         if form.is_valid():
             user = form.save()
             return HttpResponseRedirect(reverse('list_users'))
 
-    return render(request, 'om/edit_user.html', { 'form': form, 'containers': instances })
+    return render(request, 'om/edit_user.html', { 'form': form, 'containers': instances, 'user': user_inst, 'delete_ok': delete_ok })
 
 @login_required
 def list_users(request):

@@ -11,7 +11,7 @@
 {% block content %}
     <div class="ui form error segment">
         <h1>Add User</h1>
-        <form action="/new_user/" method="post">
+        <form action="{% url 'new_user' %}" method="post">
             {% csrf_token %}
             {% if form.non_field_errors %}
                 <div class="ui error message">
