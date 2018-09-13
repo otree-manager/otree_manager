@@ -10,6 +10,7 @@ urlpatterns = [
     path('privacy/', views.privacy, name='privacy'),
     path('lobby/<str:instance_name>/', views.lobby_overview, name="lobby_overview"),
     path('lobby/<str:instance_name>/<str:participant_label>/', views.lobby, name="lobby"),
+    path('lobby/download/<str:instance_name>/<str:os>/', views.download_shortcuts, name="download_shortcuts"),
 
     path('user/login/', auth_views.login, { 'template_name': 'om/login.html' }, name='login'),
     path('user/logout/', auth_views.logout, {'template_name': 'om/logout.html' }, name="logout"),

@@ -100,9 +100,9 @@
                                         <td>Download Lobby Shortcuts</td>
                                         <td id="otree_lobby_shortcuts">
                                             Chrome:
-                                            <a href="#" target="_blank"><i class="black bordered windows link icon"></i></a> 
-                                            <a href="#" target="_blank"><i class="black bordered apple link icon"></i></a>
-                                            <a href="#" target="_blank"><i class="black bordered linux link icon"></i></a>
+                                            <a href="{% url 'download_shortcuts' instance_name=instance.name os='win'%}" target="_blank"><i class="black bordered windows link icon"></i></a> 
+                                            <a href="{% url 'download_shortcuts' instance_name=instance.name os='mac'%}" target="_blank"><i class="black bordered apple link icon"></i></a>
+                                            <a href="{% url 'download_shortcuts' instance_name=instance.name os='linux'%}" target="_blank"><i class="black bordered linux link icon"></i></a>
                                         </td>
                                     </tr>
                                 </tbody>

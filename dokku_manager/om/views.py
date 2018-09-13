@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 
 from django.contrib.auth.models import Group
@@ -7,6 +7,11 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Permission
 
 from django.contrib.auth.forms import PasswordResetForm
+
+import zipfile
+import time
+import io
+import os
 
 from .models import oTreeInstance, User
 from .forms import (
@@ -62,10 +67,9 @@ def lobby_overview(request, instance_name):
 
 
 @login_required
-def download_shortcuts(request):
-    def gen_shortcut(label, os):
+def download_shortcuts(request, instance_name, os):
+    def gen_shortcut(url, label, os):
         arguments = "--kiosk --app="
-        url = "http://www.spiegel.de#"
         shebang = "#!/bin/bash"
 
         if os == "mac":
@@ -97,18 +101,30 @@ fi
 
         return (filename, content)
 
-    def zip_shortcuts(participant_labels, os):
+    def zip_shortcuts(url, participant_labels, os):
         zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, 'w') as zip:
+        with zipfile.ZipFile(zip_buffer, mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
             for label in participant_labels:
-                filename, content = gen_shortcut(label, os)
+                filename, content = gen_shortcut(url, label, os)
                 zip_info = zipfile.ZipInfo(filename, date_time=time.localtime())
                 zip_info.external_attr = 0o100755 << 16
                 zip.writestr(zip_info, content)
 
         return zip_buffer
 
-    pass
+    if not os in ["win", "mac", "linux"]:
+        return HttpResponse(404)
+
+
+    inst = oTreeInstance.objects.get(name=instance_name)
+    url = "%s?participant_label=" % inst.get_room_url()
+    data = zip_shortcuts(url, inst.get_participant_labels(), os)
+
+    zip_filename = "%s_%s_shortcuts.zip" % (instance_name, inst.otree_room_name)
+
+    response = HttpResponse(data.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = "attachement; filename=%s" % zip_filename   
+    return response
 
 @login_required
 def change_key_file(request):

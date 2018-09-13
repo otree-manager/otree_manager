@@ -85,7 +85,7 @@ class oTreeInstance(models.Model):
     otree_auth_level = models.CharField(max_length=200, blank=True)
     otree_production = models.IntegerField(null=True, blank=True)
     otree_room_name = models.CharField(max_length=200, blank=True)
-    otree_participant_labels = models.TextField(default="'[]'")
+    otree_participant_labels = models.TextField(default="[]")
 
     web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
                                        MaxValueValidator(settings.MAX_WEB)], default=1)
