@@ -1,3 +1,4 @@
+setuptools
 django
 channels-redis
 psycopg2-binary
