@@ -9,9 +9,9 @@ sed -i '/inet_interfaces = all/c\inet_interfaces = localhost' /etc/postfix/main.
 postfix reload
 
 
-# create dir and adjust 
-mkdir /var/opt/otree_manager
-chmod -R root:users /var/opt/otree_manager
+# create dirs
+mkdir /opt/otree_manager
+mkdir -p /var/log/otree_manager
 
 
 # postgresql
@@ -25,18 +25,18 @@ GRANT ALL PRIVILEGES ON DATABASE otree_manager TO otree_manager_user;
 
 # /etc/supervisor/conf.d/otree_manager.conf
 [program:otree_manager]
-command=/var/opt/otree_manager/venv/bin/daphne -b 127.0.0.1 -p 8001 dokku_manager.asgi:application
-directory=/var/opt/otree_manager
-stdout_logfile=/var/opt/otree_manager/log/otree_manager-supervisor.log
-stderr_logfile=/var/opt/otree_manager/log/otree_manager-supervisor-errors.log
+command=/opt/otree_manager/venv/bin/daphne -b 127.0.0.1 -p 8001 dokku_manager.asgi:application
+directory=/opt/otree_manager
+stdout_logfile=/var/log/otree_manager/otree_manager-supervisor.log
+stderr_logfile=/var/log/otree_manager/otree_manager-supervisor-errors.log
 autostart=true
 autorestart=true
     
 [program:otree_manager_worker]
-command=/var/opt/otree_manager/venv/bin/python manage.py runworker dokku_tasks
-directory=/var/opt/otree_manager
-stdout_logfile=/var/opt/otree_manager/log/otree_manager_worker-supervisor.log
-stderr_logfile=/var/opt/otree_manager/log/otree_manager_worker-supervisor-errors.log
+command=/opt/otree_manager/venv/bin/python manage.py runworker dokku_tasks
+directory=/opt/otree_manager
+stdout_logfile=/var/log/otree_manager/otree_manager_worker-supervisor.log
+stderr_logfile=/var/log/otree_manager/otree_manager_worker-supervisor-errors.log
 autostart=true
 autorestart=true
 
