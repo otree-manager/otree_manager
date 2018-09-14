@@ -11,3 +11,4 @@ install_notes.txt
 build/
 dist/
 *.egg-info
+debian/
