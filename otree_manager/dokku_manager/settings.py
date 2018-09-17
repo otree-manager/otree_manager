@@ -43,7 +43,7 @@ except NameError:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'oforest.org']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.oforest.org']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 
 
@@ -176,7 +176,7 @@ X_FRAME_OPTIONS = "DENY"
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 DOKKU_DOMAIN = "oforest.org"
-BASE_URL = "http://oforest.org:8080"
+BASE_URL = "http://oforest.org"
 DOKKU_BASE = "/home/dokku"
 
 # scaling

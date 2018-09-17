@@ -8,9 +8,10 @@ _static_root/
 log/
 secret.txt
 install_notes.txt
-<<<<<<< HEAD
 build/
 dist/
 *.egg-info
 keyfiles/*
 *.log
+*.conf
+debian/
