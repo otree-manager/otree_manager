@@ -43,7 +43,7 @@ except NameError:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'oforest.org']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 
 
@@ -175,8 +175,8 @@ X_FRAME_OPTIONS = "DENY"
 # settings for the login / auth system
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
-DOKKU_DOMAIN = "localhost"
-BASE_URL = "http://localhost:8080"
+DOKKU_DOMAIN = "oforest.org"
+BASE_URL = "http://oforest.org:8080"
 DOKKU_BASE = "/home/dokku"
 
 # scaling
@@ -185,9 +185,9 @@ MAX_WORKERS = 4
 MAX_WEB = 4
 
 # settings for mail
-#EMAIL_HOST = 'localhost'
-#EMAIL_PORT = 25
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
 # Custom User Model
 AUTH_USER_MODEL = 'om.User'
