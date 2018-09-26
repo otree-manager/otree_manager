@@ -228,6 +228,9 @@ class oTreeInstance(models.Model):
             },
         )
 
+        # this is dangerous. 
+        # changing the admin password means resetting the whole database
+        # this should be adressed or removed.
         self.reset_database(user_id)
 
 

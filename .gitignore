@@ -1,6 +1,6 @@
 *.pyc
 *__pycache__
-keyfiles/*
+*/keyfiles/*
 tmp/*
 !*/.gitkeep
 venv/
