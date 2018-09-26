@@ -9,9 +9,11 @@ log/
 secret.txt
 install_notes.txt
 build/
+_build/
 dist/
 *.egg-info
 keyfiles/*
 *.log
 *.conf
 debian/
+*.idea
