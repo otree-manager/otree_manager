@@ -17,3 +17,4 @@ keyfiles/*
 *.conf
 debian/
 *.idea
+*DS_Store*
