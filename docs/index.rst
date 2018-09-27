@@ -11,6 +11,7 @@ Features
 - create and manage fully independent, production-ready oTree instances
 - intuitive web interface for lab managers and experimenters
 - Heroko-ish deployment of experiments with Git
+- easy to remember URLs, no manual port configuration
 - automatic configuration of PostgreSQL, Redis, and environment variables for production
 - written in Python, built on industry standards (Docker, Dokku, Django)
 

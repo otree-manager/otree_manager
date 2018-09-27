@@ -4,7 +4,7 @@ User Guide
 Setup
 ^^^^^^^^
 As a user, ask a super-user to set up an account for you. S/he will need your name and a valid email address.
-Once the account has been created, you will receive an email asking you to set your password. After you have completed this step, you can login to the web interface.
+Once the account has been created, you will receive an email with your username. It will ask you to set your password. After you have completed this step, you can login to the web interface.
 
 First Login
 ^^^^^^^^^^^
@@ -87,3 +87,16 @@ Actions
 | Reset the oTree database.  
 | *This will prompt you to confirm your action.*
 
+
+Lobby
+^^^^^
+
+When running experiments in a laboratory setting, experimenters often want to setup the room and workstations before participants enter the room. Typically, the experimenter boots the computers and opens the experimental software. In the case of oTree, this means starting a browser (in kiosk mode) and navigating to the correct session's URL. oTree's room feature caters to this use case as it provides persistent links to a waiting page. These links can be used in combination with participant labels to easily map workstations to data collected in the experiment for payment purposes.
+
+The room feature also allows to open browsers on all workstations and have the clients wait for the session to start. However, many times the exact number if participants in a session is ex-ante uncertain. Participants may fail to show up without prior notice. In these cases, if fewer participants are present than anticipated, the experimenter has to manually close the browsers on unused workstations so they do not take part in the session. This is especially important in experiments which rely on group matching, as participants might end up being matched with an unused client. Importantly, the 'present' counter on oTree's room admin page is also not helpful in checking for the correct number of participants if the links have been opened on all client computers beforehand. 
+
+oTree Manager's Lobby feature avoids the manual intervention by the experimenter. Building on the room feature of oTree, it provides individual links for each participant label. If opened, the screen greets the participant and asks him/her to simply click a button once they have settled in at their cubicle. Clicking the button forwards the participants to oTree's actual room waiting page.
+
+This setup has multiple advantages: First, the 'present' counter on oTree's room admin page is meaningful, as only those clients show up, which have participants who clicked the 'ready' button. Second, because of the additional step necessary to get to the room's waiting page, there is no need to manually close the browser on unused workstations. They will not be connected to your oTree session.
+
+If a room has ben configured for use with the Lobby feature, the detail view provides a link to the Lobby Overview, which shows all lobby links in a convenient grid. It also provides download links for desktop shortcuts for each client. The shortcuts expect the Chrome or Chromium browsers to be installed. The browser is both modern and comes with an integrated kiosk mode. The shortcuts are available for all major operating systems.
