@@ -14,7 +14,6 @@ dist/
 *.egg-info
 keyfiles/*
 *.log
-*.conf
 debian/
 *.idea
 *DS_Store*
