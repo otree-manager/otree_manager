@@ -127,7 +127,7 @@ class oTreeInstance(models.Model):
         if not self.otree_room_name:
             return None
 
-        lobby_url = "%s/lobby/%s/" % (settings.BASE_URL, self.name)
+        lobby_url = "%s%s/lobby/%s/" % ('http://', settings.DOKKU_DOMAIN, self.name)
         return lobby_url
 
     def refresh_from_dokku(self, user_id):
