@@ -2,16 +2,15 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 
-from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.models import Permission
+from django.conf import settings
+
 
 from django.contrib.auth.forms import PasswordResetForm
 
 import zipfile
 import time
 import io
-import os
 
 from .models import oTreeInstance, User
 from .forms import (
@@ -23,6 +22,11 @@ from .forms import (
     Edit_User_Form,
     Change_Room_Form
 )
+
+
+def get_room_url(request, inst):
+    prefix = 'https' if request.is_secure() else 'http'
+    return "%s://%s.%s/room/%s/" % (prefix, inst.name, settings.DOKKU_DOMAIN, inst.otree_room_name)
 
 
 @login_required
@@ -46,14 +50,15 @@ def lobby(request, instance_name, participant_label):
     if not inst.deployed:
         return render(request, 'om/lobby.html', { 'redirect_url': '', 'error_msg': 'oTree not deployed' })
 
-    room_url = inst.get_room_url()
+    room_url = get_room_url(request, inst)
     if not room_url:
         return render(request, 'om/lobby.html', { 'redirect_url': '', 'error_msg': 'invalid room name' })
 
     if not inst.participant_label_valid(participant_label):
-        return render(request, 'om/lobby.html', { 'redirect_url': '', 'error_msg': 'invalid participant label' }) 
+        return render(request, 'om/lobby.html', { 'redirect_url': '', 'error_msg': 'invalid participant label' })
 
-
+    prefix = 'https' if request.is_secure() else 'http'
+    room_url = "%s://%s.%s/" % (prefix, inst.name, settings.DOKKU_DOMAIN)
     redirect_url = "%s?participant_label=%s" % (room_url, participant_label)
     return render(request, 'om/lobby.html', { 'redirect_url': redirect_url, 'error_msg': None })
 
@@ -117,7 +122,7 @@ fi
 
 
     inst = oTreeInstance.objects.get(name=instance_name)
-    url = "%s?participant_label=" % inst.get_room_url()
+    url = "%s?participant_label=" % get_room_url(request, inst)
     data = zip_shortcuts(url, inst.get_participant_labels(), os)
 
     zip_filename = "%s_%s_shortcuts.zip" % (instance_name, inst.otree_room_name)
@@ -293,8 +298,8 @@ def detail(request, instance_id=None):
 
     plabel = ", ".join(inst.get_participant_labels())
 
-    lurl = inst.get_lobby_url()
-    lurl = lurl if lurl is not None else ""
+    #lurl = inst.get_lobby_url()
+    lurl = reverse('lobby_overview', args=[inst.name])
 
     return render(request, 'om/detail.html', {'instance': inst, 'otree_participant_labels': plabel, 'lobby_url': lurl })
 

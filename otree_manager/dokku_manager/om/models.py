@@ -2,16 +2,12 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-
+from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
-
-from .choices import *
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-import string
-import random
 import os
 import json
 
@@ -109,26 +105,8 @@ class oTreeInstance(models.Model):
         git_url = "dokku@%s:%s" % (settings.DOKKU_DOMAIN, self.name)
         return git_url
 
-    # fix for SSL
-    def url(self):
-        return "http://%s.%s/" % (self.name, settings.DOKKU_DOMAIN)
-
     def participant_label_valid(self, participant_label):
         return participant_label in self.get_participant_labels()
-
-    def get_room_url(self):
-        if not self.otree_room_name:
-            return None
-
-        room_url = "%sroom/%s/" % (self.url(), self.otree_room_name)
-        return room_url
-
-    def get_lobby_url(self):
-        if not self.otree_room_name:
-            return None
-
-        lobby_url = "%s%s/lobby/%s/" % ('http://', settings.DOKKU_DOMAIN, self.name)
-        return lobby_url
 
     def refresh_from_dokku(self, user_id):
         async_to_sync(channel_layer.send)(
@@ -203,8 +181,7 @@ class oTreeInstance(models.Model):
         self.otree_admin_password = User.objects.make_random_password()
         self.otree_auth_level = "STUDY"
         self.save()
-
-        self.set_environment(user_id)       
+        self.set_environment(user_id)
 
 
     def set_environment(self, user_id=-1):
