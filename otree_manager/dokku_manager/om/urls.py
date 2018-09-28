@@ -26,7 +26,7 @@ urlpatterns = [
     
     re_path(r'^user/password/reset/token/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         auth_views.PasswordResetConfirmView.as_view(template_name='om/password_reset_confirm.html'), name='password_reset_confirm'),
-    path('user/password/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='om/password_reset_complete.html'), name='password_reset_complete'),
+    path('user/password/reset/complete/', auth_views.PasswordResetCompleteView.as_view(template_name='om/password_reset_complete.html'), name='password_reset_complete'),
     
     path('user/password/change/', auth_views.PasswordChangeView.as_view(template_name='om/password_change.html'), name='password_change'),
     path('user/password/change/done/', auth_views.PasswordChangeDoneView.as_view(template_name='om/password_change_complete.html'), name='password_change_done'),
