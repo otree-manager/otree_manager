@@ -57,8 +57,6 @@ def lobby(request, instance_name, participant_label):
     if not inst.participant_label_valid(participant_label):
         return render(request, 'om/lobby.html', {'redirect_url': '', 'error_msg': 'invalid participant label'})
 
-    prefix = 'https' if request.is_secure() else 'http'
-    room_url = "%s://%s.%s/" % (prefix, inst.name, settings.DOKKU_DOMAIN)
     redirect_url = "%s?participant_label=%s" % (room_url, participant_label)
     return render(request, 'om/lobby.html', {'redirect_url': redirect_url, 'error_msg': None})
 
