@@ -52,7 +52,7 @@ ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 INSTALLED_APPS = [
     'dokku_manager.om.apps.OmConfig',
     'channels',
-    'django.contrib.admin',
+#    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
