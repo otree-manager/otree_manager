@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.translation import gettext_lazy as _
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -28,6 +29,8 @@ class User(AbstractUser):
 
     public_key_set = models.BooleanField(default=False)
     public_key_file = models.FileField(upload_to=path_and_filename)
+
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
     def remove_public_key(self):
         async_to_sync(channel_layer.send)(
