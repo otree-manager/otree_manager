@@ -1,0 +1,41 @@
+{% extends 'om/base.html' %}
+{% load static %}
+{% block styles %}
+    <style type="text/css">
+        .ui.container {
+            width: 500px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="ui form error segment">
+        <h1>oTree Manager Login</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="ui error message">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}" />
+            {% else %}
+                <input type="hidden" name="next" value="/" />
+            {% endif %}
+            <div class="field">
+                {{ form.username.errors }}
+                {{ form.username.label_tag }}
+                {{ form.username }}
+            </div>
+            <div class="field">
+                {{ form.password.errors }}
+                {{ form.password.label_tag }}
+                {{ form.password }}
+            </div>
+
+            <button class="ui blue submit button" type="submit">Login</button>
+            <div style="float: right;"><a href="{% url 'password_reset' %}">Forgotten your password?</a></div>
+        </form>
+    </div>
+{% endblock %}

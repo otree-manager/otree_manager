@@ -1,0 +1,60 @@
+{% extends 'om/base_ws.html' %}
+{% load static %}
+{% block head %}
+    <title>oTree Manager Home</title>
+{% endblock %}
+
+{% block menu %}
+    <div class="item header">
+        oTree Manager
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if not instances and not request.user.is_superuser %}
+        <p align="center">You have not been assigend any oTree containers.<br/>Ask your Lab Manager to create one for you.</p>
+    {% endif %}
+    <div class="ui centered stackable grid">
+        {% for instance in instances %}
+            <div class="four wide column">
+                <a class="ui basic button oTreeInstance" href="{% url 'detail' instance_id=instance.id %}">
+                    <p>
+                        {% if instance.deployed %}
+                            <i class="big green hdd icon"></i>
+                        {% else %}
+                            <i class="big orange hdd icon"></i>
+                        {% endif %}
+                    </p>
+                    <p><b>{{ instance.name }}</b></p>
+                    <p>{{ instance.owned_by.first_name }} {{ instance.owned_by.last_name }}</p>
+                </a>
+            </div>
+        {% endfor %}
+        {% if perms.is_admin %}
+            <div class="four wide column">
+                <a class="ui basic button oTreeInstance" href="{% url 'new_app' %}">
+                    <p>
+                        <i class="big icons">
+                            <i class="hdd icon"></i>
+                            <i class="top right corner orange add icon"></i>
+                        </i>
+                    </p>
+                    <p><b>Create oTree Container</b></p>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block styles %}
+    <style type="text/css">
+        .oTreeInstance {
+            width: 180px;
+            height: 120px;
+            overflow-wrap: break-word;
+        }
+        .oTreeInstance .icon {
+            margin: 0 !important;
+        }
+    </style>
+{% endblock %}

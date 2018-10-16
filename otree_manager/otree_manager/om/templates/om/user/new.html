@@ -1,0 +1,55 @@
+{% extends 'om/base_ws.html' %}
+{% load static %}
+{% block head %}
+    <title>New User</title>
+{% endblock %}
+{% block menu %}
+    <div class="item header">
+        Add User
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="ui form error segment">
+        <h1>Add User</h1>
+        <form action="{% url 'new_user' %}" method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="ui error message">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            <div class="field">
+                {{ form.first_name.errors }}
+                {{ form.first_name.label_tag }}
+                {{ form.first_name }}
+            </div>
+            <div class="field">
+                {{ form.last_name.errors }}
+                {{ form.last_name.label_tag }}
+                {{ form.last_name }}
+            </div>
+            <div class="field">
+                {{ form.username.errors }}
+                {{ form.username.label_tag }}
+                {{ form.username }}
+            </div>
+            <div class="field">
+                {{ form.email.errors }}
+                {{ form.email.label_tag }}
+                {{ form.email }}
+            </div>
+            <div class="field">
+                {{ form.is_superuser.errors }}
+                {{ form.is_superuser.label_tag }}
+                {{ form.is_superuser }}
+            </div>
+            <button class="ui primary button" type="submit">Create</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $('.ui.dropdown').dropdown();
+    </script>
+{% endblock %}
