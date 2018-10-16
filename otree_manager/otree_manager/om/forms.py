@@ -1,12 +1,12 @@
-from django import forms 
-from django.contrib.auth import authenticate, get_user_model
+from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UsernameField
 
 from django.utils.crypto import get_random_string
 
 import gettext
 
-from .models import OTreeInstance, User
+from .models import OTreeInstance
 
 import subprocess
 from django.core.files.storage import default_storage
@@ -16,8 +16,6 @@ import os
 UserModel = get_user_model()
 _ = gettext.gettext
 
-
-
 error_messages = {
     'password_mismatch': _("The two password fields didn't match."),
     'file_size': _("The file is too large (max 1kb)."),
@@ -26,14 +24,16 @@ error_messages = {
     'no_labels': _("Could not read labels from file."),
 }
 
-class Edit_User_Form(forms.ModelForm):
+
+class EditUserForm(forms.ModelForm):
     class Meta:
         model = UserModel
         fields = ['username', 'first_name', 'last_name', 'email', 'is_superuser']
 
     pass
 
-class Change_Room_Form(forms.ModelForm):
+
+class ChangeRoomForm(forms.ModelForm):
     labels_file = forms.FileField()
 
     class Meta:
@@ -47,13 +47,10 @@ class Change_Room_Form(forms.ModelForm):
         if participant_label_file.size > 1024:
             raise forms.ValidationError(error_messages['file_size'], code="invalid file")
 
-
         if not participant_label_file:
             raise forms.ValidationError(error_messages['no_labels'], code="invalid file")
 
-
         return participant_label_file
-
 
     def save(self, commit=True):
         inst = super().save()
@@ -68,15 +65,14 @@ class Change_Room_Form(forms.ModelForm):
         return inst
 
 
-
-class Change_Key_Form(forms.ModelForm):
+class ChangeKeyForm(forms.ModelForm):
     class Meta:
         model = UserModel
         fields = ['public_key_file']
 
     def clean_public_key_file(self):
         public_key_file = self.cleaned_data.get('public_key_file', False)
-        
+
         # reject files over 1kb
         if public_key_file.size > 1024:
             raise forms.ValidationError(error_messages['file_size'], code="invalid file")
@@ -87,10 +83,10 @@ class Change_Key_Form(forms.ModelForm):
         if not pattern.match(content):
             raise forms.ValidationError(error_messages['keyfile_pattern'], code="invalid file")
 
-        filename = public_key_file.name 
+        filename = public_key_file.name
         file_obj = public_key_file
 
-        file_path = 'tmp/'+filename
+        file_path = 'tmp/' + filename
 
         with default_storage.open(file_path, 'wb+') as destination:
             for chunk in file_obj.chunks():
@@ -105,7 +101,7 @@ class Change_Key_Form(forms.ModelForm):
         if proc.returncode != 0:
             # notify user of error then return
             raise forms.ValidationError(error_messages['invalid_file'], code="invalid file")
-        
+
         return public_key_file
 
     def save(self, commit=True):
@@ -114,7 +110,7 @@ class Change_Key_Form(forms.ModelForm):
         return user
 
 
-class Add_New_Instance_Form(forms.ModelForm):
+class AddNewInstanceForm(forms.ModelForm):
     class Meta:
         model = OTreeInstance
         fields = ['name', 'owned_by']
@@ -122,7 +118,7 @@ class Add_New_Instance_Form(forms.ModelForm):
         # needs checks for valid names!
 
 
-class Change_OTree_Password(forms.ModelForm):
+class ChangeOTreePassword(forms.ModelForm):
     password_2 = forms.CharField(label="Password confirmation", max_length="100", widget=forms.PasswordInput())
 
     class Meta:
@@ -142,14 +138,13 @@ class Change_OTree_Password(forms.ModelForm):
 
         return cleaned_data
 
-
     def save(self, commit=True):
         inst = super().save()
         inst.set_environment()
         return inst
 
 
-class Change_Scaling_Form(forms.ModelForm):
+class ChangeScalingForm(forms.ModelForm):
     class Meta:
         model = OTreeInstance
         fields = ['web_dynos', 'worker_dynos']
@@ -158,9 +153,9 @@ class Change_Scaling_Form(forms.ModelForm):
         inst = super().save()
         inst.scale_dokku_app()
         return inst
-        
 
-class Add_User_Form(forms.ModelForm):
+
+class AddUserForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges, from the given username
     """

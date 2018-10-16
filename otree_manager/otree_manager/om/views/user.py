@@ -7,21 +7,21 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import PasswordResetForm
 
 from otree_manager.om.forms import (
-    Add_User_Form,
-    Change_Key_Form,
-    Edit_User_Form,
+    AddUserForm,
+    ChangeKeyForm,
+    EditUserForm,
 )
 
 
 @login_required
 def change_key_file(request):
     if request.method == 'POST':
-        form = Change_Key_Form(request.POST or None, request.FILES or None, instance=request.user)
+        form = ChangeKeyForm(request.POST or None, request.FILES or None, instance=request.user)
         if form.is_valid():
             user = form.save()
             return HttpResponseRedirect(reverse('index'))
     else:
-        form = Change_Key_Form()
+        form = ChangeKeyForm()
 
     context = {'form': form}
     return render(request, 'om/user/change_key_file.html', context)
@@ -45,7 +45,7 @@ def password_reset(request):
 @permission_required('om.add_users', login_url='user/login/', raise_exception=True)
 def new_user(request):
     if request.method == 'POST':
-        form = Add_User_Form(request.POST)
+        form = AddUserForm(request.POST)
         if form.is_valid():
             new_user = form.save()
             reset_form = PasswordResetForm({'email': new_user.email})
@@ -58,7 +58,7 @@ def new_user(request):
             )
             return HttpResponseRedirect(reverse('list_users'))
     else:
-        form = Add_User_Form()
+        form = AddUserForm()
     return render(request, 'om/user/new.html', {'form': form})
 
 
@@ -90,7 +90,7 @@ def edit_user(request, user_id):
 
     user_inst = User.objects.get(id=user_id)
     user_count = User.objects.all().count()
-    form = Edit_User_Form(request.POST or None, instance=user_inst)
+    form = EditUserForm(request.POST or None, instance=user_inst)
 
     instances = OTreeInstance.objects.filter(owned_by=user_inst)
 

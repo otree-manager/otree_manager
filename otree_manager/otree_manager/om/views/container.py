@@ -6,10 +6,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from otree_manager.om.models import OTreeInstance, User
 from otree_manager.om.forms import (
-    Add_New_Instance_Form,
-    Change_OTree_Password,
-    Change_Scaling_Form,
-    Change_Room_Form
+    AddNewInstanceForm,
+    ChangeOTreePassword,
+    ChangeScalingForm,
+    ChangeRoomForm
 )
 
 import zipfile
@@ -83,13 +83,13 @@ fi
 def new_app(request):
     if request.method == 'POST':
         # handle data posted
-        form = Add_New_Instance_Form(request.POST)
+        form = AddNewInstanceForm(request.POST)
         if form.is_valid():
             new_instance = form.save()
             new_instance.create_dokku_app(request.user.id)
             return HttpResponseRedirect(reverse('index'))
     else:
-        form = Add_New_Instance_Form(initial={'enabled_plugins': [1, 2]})
+        form = AddNewInstanceForm(initial={'enabled_plugins': [1, 2]})
 
     return render(request, 'om/container/new.html', {'form': form})
 
@@ -99,15 +99,15 @@ def new_app(request):
 def change_otree_password(request, instance_id):
     if request.method == 'POST':
         inst = OTreeInstance.objects.get(id=instance_id)
-        form = Change_OTree_Password(request.POST or None, instance=inst)
+        form = ChangeOTreePassword(request.POST or None, instance=inst)
         if form.is_valid():
             inst = form.save()
             return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
 
         else:
-            form = Change_OTree_Password(request.POST)
+            form = ChangeOTreePassword(request.POST)
     else:
-        form = Change_OTree_Password()
+        form = ChangeOTreePassword()
 
     return render(request, 'om/container/change_password.html', {'form': form})
 
@@ -115,7 +115,7 @@ def change_otree_password(request, instance_id):
 @login_required
 def scale_app(request, instance_id):
     inst = OTreeInstance.objects.get(id=instance_id)
-    form = Change_Scaling_Form(request.POST or None, instance=inst)
+    form = ChangeScalingForm(request.POST or None, instance=inst)
 
     if request.method == 'POST':
         if form.is_valid():
@@ -128,7 +128,7 @@ def scale_app(request, instance_id):
 @login_required
 def change_otree_room(request, instance_id):
     inst = OTreeInstance.objects.get(id=instance_id)
-    form = Change_Room_Form(request.POST or None, request.FILES or None, instance=inst)
+    form = ChangeRoomForm(request.POST or None, request.FILES or None, instance=inst)
     if request.method == 'POST':
         if form.is_valid():
             inst = form.save()
