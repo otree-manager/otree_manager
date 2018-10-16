@@ -3,12 +3,10 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 
 from .models import User, OTreeInstance
-from .choices import PLUGINS
 
 import json
 import time
 import subprocess
-
 
 class Notifications(WebsocketConsumer):
     def connect(self):

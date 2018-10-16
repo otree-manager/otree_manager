@@ -2,14 +2,11 @@ from django import forms
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import UsernameField
 
-from django.contrib.auth.models import Group
 from django.utils.crypto import get_random_string
 
-from django.core.mail import send_mail
 import gettext
 
 from .models import OTreeInstance, User
-from .choices import *
 
 import subprocess
 from django.core.files.storage import default_storage
