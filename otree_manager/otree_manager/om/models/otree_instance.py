@@ -37,13 +37,13 @@ class OTreeInstance(models.Model):
     otree_room_name = models.CharField(max_length=200, blank=True)
     otree_participant_labels = models.TextField(default="[]")
 
-    web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
-                                                             MaxValueValidator(settings.MAX_WEB)], default=1,
-                                                 verbose_name="Web processes")
+    web_processes = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
+                                                                 MaxValueValidator(settings.MAX_WEB)], default=1,
+                                                     verbose_name="Web processes")
 
-    worker_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(settings.MIN_WORKERS),
-                                                                MaxValueValidator(settings.MAX_WORKERS)], default=1,
-                                                    verbose_name="Worker processes")
+    worker_processes = models.PositiveSmallIntegerField(validators=[MinValueValidator(settings.MIN_WORKERS),
+                                                                    MaxValueValidator(settings.MAX_WORKERS)], default=1,
+                                                        verbose_name="Worker processes")
 
     def __str__(self):
         return self.name
@@ -72,10 +72,10 @@ class OTreeInstance(models.Model):
             },
         )
 
-    def scale_dokku_app(self, user_id=-1):
-        dyno_dict = {
-            'web': str(self.web_dynos),
-            'worker': str(self.worker_dynos),
+    def scale_container(self, user_id=-1):
+        processes_dict = {
+            'web': str(self.web_processes),
+            'worker': str(self.worker_processes),
         }
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
@@ -83,11 +83,11 @@ class OTreeInstance(models.Model):
                 'type': 'scale_app',
                 'instance_name': self.name,
                 'user_id': user_id,
-                'var_dict': dyno_dict,
+                'var_dict': processes_dict,
             }
         )
 
-    def create_dokku_app(self, user_id):
+    def create_container(self, user_id):
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {
@@ -107,7 +107,7 @@ class OTreeInstance(models.Model):
             },
         )
 
-    def restart_dokku_app(self, user_id):
+    def restart_container(self, user_id):
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {

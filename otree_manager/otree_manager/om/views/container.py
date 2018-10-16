@@ -88,7 +88,7 @@ def new_app(request):
         form = AddNewInstanceForm(request.POST)
         if form.is_valid():
             new_instance = form.save()
-            new_instance.create_dokku_app(request.user.id)
+            new_instance.create_container(request.user.id)
             return HttpResponseRedirect(reverse('index'))
     else:
         form = AddNewInstanceForm(initial={'enabled_plugins': [1, 2]})
@@ -212,5 +212,5 @@ def restart_app(request, instance_id=None):
 
     print('restart app')
 
-    inst.restart_dokku_app(request.user.id)
+    inst.restart_container(request.user.id)
     return HttpResponseRedirect(reverse('detail', args=(instance_id,)))

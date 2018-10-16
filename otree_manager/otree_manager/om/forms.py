@@ -1,15 +1,11 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UsernameField
-
 from django.utils.crypto import get_random_string
-
-import gettext
-
-from .models import OTreeInstance
-
-import subprocess
 from django.core.files.storage import default_storage
+from .models import OTreeInstance
+import gettext
+import subprocess
 import re
 import os
 
@@ -22,6 +18,7 @@ error_messages = {
     'keyfile_pattern': _("The file seems to have a non-standard pattern."),
     'invalid_file': _("The file is not a valid rsa public key file."),
     'no_labels': _("Could not read labels from file."),
+    'invalid_domain_name': _("The name may only contain a-z, A-Z, 0-9 and dashes. Dashes cannot be first or last.")
 }
 
 
@@ -115,8 +112,13 @@ class AddNewInstanceForm(forms.ModelForm):
         model = OTreeInstance
         fields = ['name', 'owned_by']
 
-        # needs checks for valid names!
+        def clean_name(self):
+            name = self.cleaned_data.get('name', False)
+            pattern = re.compile("[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?")
+            if not pattern.match(name):
+                raise forms.ValidationError(error_messages['invalid_domain_name'], code="invalid name")
 
+            return name
 
 class ChangeOTreePasswordForm(forms.ModelForm):
     password_2 = forms.CharField(label="Password confirmation", max_length="100", widget=forms.PasswordInput())
@@ -147,26 +149,19 @@ class ChangeOTreePasswordForm(forms.ModelForm):
 class ChangeScalingForm(forms.ModelForm):
     class Meta:
         model = OTreeInstance
-        fields = ['web_dynos', 'worker_dynos']
+        fields = ['web_processes', 'worker_processes']
 
     def save(self, commit=True):
         inst = super().save()
-        inst.scale_dokku_app()
+        inst.scale_container()
         return inst
 
 
 class AddUserForm(forms.ModelForm):
-    """
-    A form that creates a user, with no privileges, from the given username
-    """
-
     class Meta:
         model = UserModel
         fields = (UserModel.USERNAME_FIELD, 'first_name', 'last_name', 'email', 'is_superuser')
         field_classes = {UserModel.USERNAME_FIELD: UsernameField}
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
         user = super().save(commit=False)
