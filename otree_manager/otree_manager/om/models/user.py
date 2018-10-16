@@ -50,4 +50,3 @@ class User(AbstractUser):
         )
         self.public_key_set = True
         self.save()
-

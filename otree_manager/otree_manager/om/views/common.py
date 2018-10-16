@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from otree_manager.om.models import OTreeInstance
 
-from otree_manager.om.models import OTreeInstance, User
 
 @login_required
 def index(request):

@@ -33,26 +33,17 @@ except NameError:
             Exception('Please create a %s file with random characters \
             to generate your secret key!' % SECRET_FILE)
 
-#SECRET_KEY = os.environ.get('DJANGO_SECRET', 'insecure')
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
-
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.oforest.org']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'otree_manager.om.apps.OmConfig',
     'channels',
-    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -170,7 +161,6 @@ X_FRAME_OPTIONS = "DENY"
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 DOKKU_DOMAIN = socket.gethostname()
-# BASE_URL = "http://%s" % DOKKU_DOMAIN
 DOKKU_BASE = "/home/dokku"
 
 # scaling
@@ -181,7 +171,6 @@ MAX_WEB = 4
 # settings for mail
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
 # Custom User Model
 AUTH_USER_MODEL = 'om.User'

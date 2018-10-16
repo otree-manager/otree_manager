@@ -18,7 +18,7 @@ def change_key_file(request):
     if request.method == 'POST':
         form = ChangeKeyForm(request.POST or None, request.FILES or None, instance=request.user)
         if form.is_valid():
-            user = form.save()
+            form.save()
             return HttpResponseRedirect(reverse('index'))
     else:
         form = ChangeKeyForm()
@@ -28,27 +28,13 @@ def change_key_file(request):
 
 
 @login_required
-def change_password(request):
-    return render(request, 'om/user/password_change.html', {})
-
-
-@login_required
-def password_change_done(request):
-    return render(request, 'om/user/password_change_done.html', {})
-
-
-def password_reset(request):
-    return render(request, 'om/user/reset_password.html', {})
-
-
-@login_required
 @permission_required('om.add_users', login_url='user/login/', raise_exception=True)
 def new_user(request):
     if request.method == 'POST':
         form = AddUserForm(request.POST)
         if form.is_valid():
-            new_user = form.save()
-            reset_form = PasswordResetForm({'email': new_user.email})
+            nuser = form.save()
+            reset_form = PasswordResetForm({'email': nuser.email})
             assert reset_form.is_valid()
             reset_form.save(
                 request=request,
@@ -98,7 +84,7 @@ def edit_user(request, user_id):
 
     if request.method == "POST":
         if form.is_valid():
-            user = form.save()
+            form.save()
             return HttpResponseRedirect(reverse('list_users'))
 
     return render(request, 'om/user/edit.html',

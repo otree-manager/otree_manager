@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from otree_manager.om.models import OTreeInstance, User
+from otree_manager.om.models import OTreeInstance
 from otree_manager.om.utils import get_room_url
 
 

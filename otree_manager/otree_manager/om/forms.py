@@ -118,7 +118,7 @@ class AddNewInstanceForm(forms.ModelForm):
         # needs checks for valid names!
 
 
-class ChangeOTreePassword(forms.ModelForm):
+class ChangeOTreePasswordForm(forms.ModelForm):
     password_2 = forms.CharField(label="Password confirmation", max_length="100", widget=forms.PasswordInput())
 
     class Meta:

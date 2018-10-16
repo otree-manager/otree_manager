@@ -1,9 +1,8 @@
 from channels.consumer import SyncConsumer
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
-
 from .models import User, OTreeInstance
-
+from .utils import PLUGINS
 import json
 import time
 import subprocess
@@ -16,11 +15,6 @@ class Notifications(WebsocketConsumer):
 
     def disconnect(self, close_code):
         self.scope["user"].ws_channel = ''
-
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        action = text_data_json['action']
-        message = text_data_json['message']
 
     def ws_forward(self, event):
         """Forwards a message from a background task (channel layer) to the user through websocket"""

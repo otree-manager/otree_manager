@@ -5,8 +5,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .user import User
-from otree_manager.om.utils import path_and_filename
 import json
+
 
 channel_layer = get_channel_layer()
 
@@ -126,7 +126,8 @@ class OTreeInstance(models.Model):
                 "instance_name": self.name
             },
         )
-        num_delete, _ = self.delete()
+        if delete_self:
+            num_delete, _ = self.delete()
 
     def set_default_environment(self, user_id=-1):
         self.otree_production = 1
