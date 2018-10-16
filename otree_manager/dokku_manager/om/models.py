@@ -2,16 +2,12 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
-
 from django.core.validators import MinValueValidator, MaxValueValidator
-
-from .choices import *
+from django.utils.translation import gettext_lazy as _
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-import string
-import random
 import os
 import json
 
@@ -34,6 +30,8 @@ class User(AbstractUser):
     public_key_set = models.BooleanField(default=False)
     public_key_file = models.FileField(upload_to=path_and_filename)
 
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
+
     def remove_public_key(self):
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
@@ -45,12 +43,11 @@ class User(AbstractUser):
             },
         )
         self.public_key_set = False
-        self.save()  
-
+        self.save()
 
     def set_public_key(self):
         if self.public_key_set:
-            self.remove_public_key() 
+            self.remove_public_key()
 
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
@@ -64,20 +61,20 @@ class User(AbstractUser):
         )
         self.public_key_set = True
         self.save()
-        
 
 
 class oTreeInstance(models.Model):
     name = models.CharField(
-        max_length=32, 
+        max_length=32,
         validators=[
-            RegexValidator(regex='^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$', 
+            RegexValidator(
+                regex='^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$',
                 message='name is not suitable',
                 code='invalid')
         ]
     )
-    owned_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Experimenter")    
-    
+    owned_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Experimenter")
+
     deployed = models.BooleanField(default=False)
     git_sha = models.CharField(max_length=200, blank=True)
     deploy_source = models.CharField(max_length=200, blank=True)
@@ -91,7 +88,8 @@ class oTreeInstance(models.Model):
     otree_participant_labels = models.TextField(default="[]")
 
     web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
-                                       MaxValueValidator(settings.MAX_WEB)], default=1, verbose_name="Web processes")
+                                        MaxValueValidator(settings.MAX_WEB)], default=1, verbose_name="Web processes")
+                                       
     worker_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(settings.MIN_WORKERS),
                                        MaxValueValidator(settings.MAX_WORKERS)], default=1, verbose_name="Worker processes")
 
@@ -109,26 +107,8 @@ class oTreeInstance(models.Model):
         git_url = "dokku@%s:%s" % (settings.DOKKU_DOMAIN, self.name)
         return git_url
 
-    # fix for SSL
-    def url(self):
-        return "http://%s.%s/" % (self.name, settings.DOKKU_DOMAIN)
-
     def participant_label_valid(self, participant_label):
         return participant_label in self.get_participant_labels()
-
-    def get_room_url(self):
-        if not self.otree_room_name:
-            return None
-
-        room_url = "%sroom/%s/" % (self.url(), self.otree_room_name)
-        return room_url
-
-    def get_lobby_url(self):
-        if not self.otree_room_name:
-            return None
-
-        lobby_url = "%s/lobby/%s/" % (settings.BASE_URL, self.name)
-        return lobby_url
 
     def refresh_from_dokku(self, user_id):
         async_to_sync(channel_layer.send)(
@@ -146,7 +126,7 @@ class oTreeInstance(models.Model):
             'worker': str(self.worker_dynos),
         }
         async_to_sync(channel_layer.send)(
-            "dokku_tasks", 
+            "dokku_tasks",
             {
                 'type': 'scale_app',
                 'instance_name': self.name,
@@ -154,7 +134,6 @@ class oTreeInstance(models.Model):
                 'var_dict': dyno_dict,
             }
         )
-
 
     def create_dokku_app(self, user_id):
         async_to_sync(channel_layer.send)(
@@ -196,16 +175,14 @@ class oTreeInstance(models.Model):
             },
         )
         num_delete, _ = self.delete()
-        
+
     def set_default_environment(self, user_id=-1):
         self.otree_production = 1
         self.otree_admin_username = "admin"
         self.otree_admin_password = User.objects.make_random_password()
         self.otree_auth_level = "STUDY"
         self.save()
-
-        self.set_environment(user_id)       
-
+        self.set_environment(user_id)
 
     def set_environment(self, user_id=-1):
         print('set env')
@@ -233,7 +210,6 @@ class oTreeInstance(models.Model):
         # this should be adressed or removed.
         self.reset_database(user_id)
 
-
     def reset_database(self, user_id):
         async_to_sync(channel_layer.send)(
             "dokku_tasks",
@@ -243,5 +219,3 @@ class oTreeInstance(models.Model):
                 "instance_name": self.name
             },
         )
-
-       

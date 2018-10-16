@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-
+import socket
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,7 +41,7 @@ except NameError:
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.oforest.org']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
@@ -52,7 +52,7 @@ ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 INSTALLED_APPS = [
     'dokku_manager.om.apps.OmConfig',
     'channels',
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -96,18 +96,18 @@ ASGI_APPLICATION = 'dokku_manager.routing.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    },
     # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'otree_manager',
-    #     'USER': 'otree_manager_user',
-    #     'PASSWORD': 'supersecure',
-    #     'HOST': 'localhost',
-    #     'PORT': '',
-    # }
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'otree_manager',
+        'USER': 'otree_manager_user',
+        'PASSWORD': os.environ.get('POSTGRES_PWD'),
+        'HOST': 'localhost',
+        'PORT': '',
+    }
 }
 
 
@@ -134,17 +134,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'CET'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
-# Channels
-ASGI_APPLICATION = "dokku_manager.routing.application"
 
 # channels redis
 CHANNEL_LAYERS = {
@@ -175,8 +169,8 @@ X_FRAME_OPTIONS = "DENY"
 # settings for the login / auth system
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
-DOKKU_DOMAIN = "oforest.org"
-BASE_URL = "http://oforest.org"
+DOKKU_DOMAIN = socket.gethostname()
+# BASE_URL = "http://%s" % DOKKU_DOMAIN
 DOKKU_BASE = "/home/dokku"
 
 # scaling

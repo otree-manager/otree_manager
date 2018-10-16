@@ -1,12 +1,9 @@
 from channels.consumer import SyncConsumer
 from channels.generic.websocket import WebsocketConsumer
-from channels.db import database_sync_to_async
 from asgiref.sync import async_to_sync
 
 from .models import User, oTreeInstance
 from .choices import PLUGINS
-
-from django.conf import settings
 
 import json
 import time
@@ -31,9 +28,10 @@ class Notifications(WebsocketConsumer):
         """Forwards a message from a background task (channel layer) to the user through websocket"""
         self.send(json.dumps(event))
 
- 
+
 class Dokku_Tasks(SyncConsumer):
     """Handles all dokku related tasks on a background worker"""
+
     def create_app(self, event):
         print('received create app task')
 
@@ -43,10 +41,8 @@ class Dokku_Tasks(SyncConsumer):
             self._notify_user(event, "create_app", proc.returncode)
             return False
 
-
         # success
         self._notify_user(event, "create_app", proc.returncode)
-
 
         # create plugins
         async_to_sync(self.channel_layer.send)("dokku_tasks", {
@@ -76,7 +72,6 @@ class Dokku_Tasks(SyncConsumer):
         inst = oTreeInstance.objects.get(name=event["instance_name"])
         inst.set_default_environment()
 
-
     def scale_app(self, event):
         print('received scale app task')
         cmd = ['dokku', '--quiet', 'ps:scale', event["instance_name"]]
@@ -92,15 +87,13 @@ class Dokku_Tasks(SyncConsumer):
             self._notify_user(event, "scale_app", proc.returncode)
             return False
 
-
         # success
         self._notify_user(event, "scale_app", proc.returncode)
 
-
     def update_app_report(self, event):
-        proc = subprocess.run(['dokku', '--quiet', 'apps:report', event["instance_name"]], 
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
+        proc = subprocess.run(['dokku', '--quiet', 'apps:report', event["instance_name"]],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
         report_dict = {
             'app_dir': '',
             'git_sha': '',
@@ -137,7 +130,6 @@ class Dokku_Tasks(SyncConsumer):
 
         self._push_report(event["user_id"], report_dict)
 
-
     def destroy_app(self, event):
         print('received destroy app task')
         proc = subprocess.run(['dokku', '--quiet', '--force', 'apps:destroy', event["instance_name"]])
@@ -161,8 +153,7 @@ class Dokku_Tasks(SyncConsumer):
             'instance_name': event["instance_name"],
             'user_id': event["user_id"],
             'plugin_name': 'postgres'
-        }) 
-
+        })
 
     def create_plugin(self, event):
         print('received create plugins event')
@@ -187,7 +178,6 @@ class Dokku_Tasks(SyncConsumer):
             'plugin_name': event['plugin_name']
         })
 
-
     def link_plugin(self, event):
         print('received link plugin event')
 
@@ -198,10 +188,9 @@ class Dokku_Tasks(SyncConsumer):
         plugin_name = "%s_%s" % (event["instance_name"], event["plugin_name"])
 
         proc = subprocess.run(['dokku', '--quiet', cmd, plugin_name, event["instance_name"]])
-        
+
         # notify user through websocket
         self._notify_user(event, "link_plugin", proc.returncode)
-
 
     def destroy_plugin(self, event):
         print('received destroy plugin event')
@@ -217,19 +206,17 @@ class Dokku_Tasks(SyncConsumer):
         # notify user through websocket
         self._notify_user(event, 'destroy_plugin', proc.returncode)
 
-
     def set_env(self, event):
         print('received set env command')
         cmd = ['dokku', '--quiet', 'config:set', event["instance_name"]]
-    
+
         for key, value in event["var_dict"].items():
             cmd.append('%s=%s' % (key, value))
 
         proc = subprocess.run(cmd, stdout=subprocess.PIPE)
-                
+
         # notify user through websocket
         self._notify_user(event, 'set_env', proc.returncode)
-
 
     def reset_database(self, event):
         print('received reset database task')
@@ -242,7 +229,6 @@ class Dokku_Tasks(SyncConsumer):
         # success
         self._notify_user(event, "reset_database", proc.returncode)
 
-
     def restart_app(self, event):
         print('received restart task')
         proc = subprocess.run(['dokku', 'ps:restart', event["instance_name"]])
@@ -253,7 +239,6 @@ class Dokku_Tasks(SyncConsumer):
 
         # success
         self._notify_user(event, "restart_app", proc.returncode)
-
 
     def user_add_key(self, event):
         print('received user add key event')
@@ -269,7 +254,7 @@ class Dokku_Tasks(SyncConsumer):
     def user_remove_key(self, event):
         print('received user remove key event')
         proc = subprocess.run(['sudo', 'dokku', 'ssh-keys:remove', event['user_name']])
-        
+
         if proc.returncode != 0:
             # notify user of error then return
             self._notify_user(event, "remove_key", proc.returncode)
@@ -277,7 +262,6 @@ class Dokku_Tasks(SyncConsumer):
 
         # success
         self._notify_user(event, "remove_key", proc.returncode)
-
 
     def add_git_permission(self, event):
         print('received user add acl event')
@@ -290,32 +274,28 @@ class Dokku_Tasks(SyncConsumer):
         # success
         self._notify_user(event, "add_acl", proc.returncode)
 
-
-
     def _notify_user(self, event, situation, returncode):
-        #print(user_id, result, message)
+        # print(user_id, result, message)
         if event['user_id'] == -1:
             return False
-            
+
         result, message = self._get_message(event, situation, returncode)
         user = User.objects.get(id=event["user_id"])
         async_to_sync(self.channel_layer.send)(user.ws_channel, {
-            'type': 'ws.forward', 
-            'kind': 'notification', 
-            'result': result, 
+            'type': 'ws.forward',
+            'kind': 'notification',
+            'result': result,
             'message': message
         })
-
 
     def _push_report(self, user_id, report_dict):
         print(user_id, report_dict)
         user = User.objects.get(id=user_id)
         async_to_sync(self.channel_layer.send)(user.ws_channel, {
-            'type': 'ws.forward', 
-            'kind': 'report', 
+            'type': 'ws.forward',
+            'kind': 'report',
             'report': report_dict
         })
-
 
     def _get_message(self, event, situation, returncode):
         result = "success" if returncode == 0 else "error"
@@ -352,13 +332,13 @@ class Dokku_Tasks(SyncConsumer):
                 "add_key": "Public key for {} could not be set.",
                 "remove_key": "Public key for {} could not be removed.",
             },
-            "info" : {
+            "info": {
 
             }
         }
 
         string_input_dict = {
-            "set_env": (event.get("instance_name", ''), ),
+            "set_env": (event.get("instance_name", ''),),
             "link_plugin": (event.get("plugin_name", ''), event.get("instance_name", '')),
             "destroy_plugin": (event.get("plugin_name", ''),),
             "create_plugin": (event.get("plugin_name", ''),),
@@ -371,8 +351,6 @@ class Dokku_Tasks(SyncConsumer):
             "add_key": (event.get("user_verbose_name", ''),),
             "remove_key": (event.get("user_verbose_name", ''),),
         }
-
-
 
         message_template = message_dict[result][situation]
         return result, message_template.format(*string_input_dict[situation])
