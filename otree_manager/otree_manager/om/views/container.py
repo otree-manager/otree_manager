@@ -3,11 +3,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.conf import settings
-
-import zipfile
-import time
-import io
 
 from otree_manager.om.models import OTreeInstance, User
 from otree_manager.om.forms import (
@@ -17,54 +12,11 @@ from otree_manager.om.forms import (
     Change_Room_Form
 )
 
+import zipfile
+import time
+import io
 
-def get_room_url(request, inst):
-    prefix = 'https' if request.is_secure() else 'http'
-    return "%s://%s.%s/room/%s/" % (prefix, inst.name, settings.DOKKU_DOMAIN, inst.otree_room_name)
-
-
-@login_required
-def index(request):
-    if not request.user.public_key_set:
-        return HttpResponseRedirect(reverse('change_key_file'))
-
-    if request.user.is_superuser:
-        show_instances = OTreeInstance.objects.order_by('-deployed', '-name').all()
-    else:
-        show_instances = OTreeInstance.objects.filter(owned_by=request.user).order_by('-deployed', '-name')
-    context = {'instances': show_instances, 'user': request.user}
-    return render(request, 'om/index.html', context)
-
-
-def lobby(request, instance_name, participant_label):
-    try:
-        inst = OTreeInstance.objects.get(name=instance_name)
-    except OTreeInstance.DoesNotExist:
-        return render(request, 'om/lobby/index.html', {'redirect_url': ''})
-
-    if not inst.deployed:
-        return render(request, 'om/lobby/index.html', {'redirect_url': '', 'error_msg': 'oTree not deployed'})
-
-    room_url = get_room_url(request, inst)
-    if not room_url:
-        return render(request, 'om/lobby/index.html', {'redirect_url': '', 'error_msg': 'invalid room name'})
-
-    if not inst.participant_label_valid(participant_label):
-        return render(request, 'om/lobby/index.html', {'redirect_url': '', 'error_msg': 'invalid participant label'})
-
-    redirect_url = "%s?participant_label=%s" % (room_url, participant_label)
-    return render(request, 'om/lobby/index.html', {'redirect_url': redirect_url, 'error_msg': None})
-
-
-def lobby_overview(request, instance_name):
-    try:
-        inst = OTreeInstance.objects.get(name=instance_name)
-    except OTreeInstance.DoesNotExist:
-        return render(request, 'om/lobby/index.html', {'redirect_url': ''})
-
-    return render(request, 'om/lobby/overview.html',
-                  {'instance': inst, 'participant_labels': inst.get_participant_labels()})
-
+from otree_manager.om.utils import get_room_url
 
 @login_required
 def download_shortcuts(request, instance_name, os):
@@ -261,11 +213,3 @@ def restart_app(request, instance_id=None):
 
     inst.restart_dokku_app(request.user.id)
     return HttpResponseRedirect(reverse('detail', args=(instance_id,)))
-
-
-def imprint(request):
-    return render(request, 'om/imprint.html', {})
-
-
-def privacy(request):
-    return render(request, 'om/privacy.html', {})

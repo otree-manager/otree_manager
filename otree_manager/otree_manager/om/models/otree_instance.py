@@ -5,7 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .user import User
-from .utils import path_and_filename
+from otree_manager.om.utils import path_and_filename
 import json
 
 channel_layer = get_channel_layer()

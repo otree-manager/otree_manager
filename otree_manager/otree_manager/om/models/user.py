@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from .utils import path_and_filename
+from otree_manager.om.utils import path_and_filename
 
 channel_layer = get_channel_layer()
 
