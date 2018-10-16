@@ -11,7 +11,7 @@
 {% block content %}
     <div class="ui form error segment">
         <h1>Scale Processes</h1>
-        <p>Typically, one web process and one worker process are enough for laboratory experiments. If you need more capacity, you can scale up the number of processes here. Ask your Lab Manager if you are unsure.</p>
+        <p>Typically, one web process and one worker process are enough for laboratory experiments. If an experiment requires more capacity, you can scale up the number of processes here.</p>
         <form method="post">
         {% csrf_token %}
         {% if form.non_field_errors %}

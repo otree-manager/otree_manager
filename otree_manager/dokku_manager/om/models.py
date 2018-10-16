@@ -91,9 +91,9 @@ class oTreeInstance(models.Model):
     otree_participant_labels = models.TextField(default="[]")
 
     web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
-                                       MaxValueValidator(settings.MAX_WEB)], default=1)
+                                       MaxValueValidator(settings.MAX_WEB)], default=1, verbose_name="Web processes")
     worker_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(settings.MIN_WORKERS),
-                                       MaxValueValidator(settings.MAX_WORKERS)], default=1)
+                                       MaxValueValidator(settings.MAX_WORKERS)], default=1, verbose_name="Worker processes")
 
     def __str__(self):
         return self.name
