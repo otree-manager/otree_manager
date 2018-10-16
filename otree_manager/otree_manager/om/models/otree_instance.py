@@ -1,66 +1,19 @@
-from django.db import models
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-import os
+from .user import User
+from .utils import path_and_filename
 import json
 
 channel_layer = get_channel_layer()
 
-
-def path_and_filename(instance, filename):
-    file_path = 'keyfiles/keyfile_id_{0}'.format(instance.id)
-    if os.path.isfile(file_path):
-        os.remove(file_path)
-    return file_path
-
-
-class User(AbstractUser):
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
-
-    ws_channel = models.CharField(max_length=255, blank=True)
-
-    public_key_set = models.BooleanField(default=False)
-    public_key_file = models.FileField(upload_to=path_and_filename)
-
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
-
-    def remove_public_key(self):
-        async_to_sync(channel_layer.send)(
-            "otree_manager_tasks",
-            {
-                "type": "user.remove.key",
-                "user_id": self.id,
-                "user_name": self.username,
-                "user_verbose_name": self.__str__(),
-            },
-        )
-        self.public_key_set = False
-        self.save()
-
-    def set_public_key(self):
-        if self.public_key_set:
-            self.remove_public_key()
-
-        async_to_sync(channel_layer.send)(
-            "otree_manager_tasks",
-            {
-                "type": "user.add.key",
-                "user_id": self.id,
-                "user_name": self.username,
-                "user_verbose_name": self.__str__(),
-                "key_path": self.public_key_file.path,
-            },
-        )
-        self.public_key_set = True
-        self.save()
-
-
 class OTreeInstance(models.Model):
+    class Meta:
+        app_label = 'om'
+
     name = models.CharField(
         max_length=32,
         validators=[
@@ -85,10 +38,12 @@ class OTreeInstance(models.Model):
     otree_participant_labels = models.TextField(default="[]")
 
     web_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
-                                        MaxValueValidator(settings.MAX_WEB)], default=1, verbose_name="Web processes")
-                                       
+                                                             MaxValueValidator(settings.MAX_WEB)], default=1,
+                                                 verbose_name="Web processes")
+
     worker_dynos = models.PositiveSmallIntegerField(validators=[MinValueValidator(settings.MIN_WORKERS),
-                                       MaxValueValidator(settings.MAX_WORKERS)], default=1, verbose_name="Worker processes")
+                                                                MaxValueValidator(settings.MAX_WORKERS)], default=1,
+                                                    verbose_name="Worker processes")
 
     def __str__(self):
         return self.name
@@ -202,7 +157,7 @@ class OTreeInstance(models.Model):
             },
         )
 
-        # this is dangerous. 
+        # this is dangerous.
         # changing the admin password means resetting the whole database
         # this should be adressed or removed.
         self.reset_database(user_id)
