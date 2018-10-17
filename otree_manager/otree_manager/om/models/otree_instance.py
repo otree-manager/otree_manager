@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .user import User
+
 import json
 
 
@@ -15,11 +16,11 @@ class OTreeInstance(models.Model):
         app_label = 'om'
 
     name = models.CharField(
-        max_length=32,
+        max_length=63,
         validators=[
             RegexValidator(
-                regex='^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$',
-                message='name is not suitable',
+                regex='^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$',
+                message='Name may only contain a-Z, 0-9, -. Dash may not be first or last.',
                 code='invalid')
         ]
     )

@@ -112,13 +112,7 @@ class AddNewInstanceForm(forms.ModelForm):
         model = OTreeInstance
         fields = ['name', 'owned_by']
 
-        def clean_name(self):
-            name = self.cleaned_data.get('name', False)
-            pattern = re.compile("[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?")
-            if not pattern.match(name):
-                raise forms.ValidationError(error_messages['invalid_domain_name'], code="invalid name")
 
-            return name
 
 class ChangeOTreePasswordForm(forms.ModelForm):
     password_2 = forms.CharField(label="Password confirmation", max_length="100", widget=forms.PasswordInput())

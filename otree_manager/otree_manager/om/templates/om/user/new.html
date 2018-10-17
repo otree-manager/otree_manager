@@ -19,29 +19,29 @@
                 </div>
             {% endif %}
             <div class="field">
-                {{ form.first_name.errors }}
                 {{ form.first_name.label_tag }}
                 {{ form.first_name }}
+                <div class="ui error message">{{ form.first_name.errors }}</div>
             </div>
             <div class="field">
-                {{ form.last_name.errors }}
                 {{ form.last_name.label_tag }}
                 {{ form.last_name }}
+                <div class="ui error message">{{ form.last_name.errors }}</div>
             </div>
             <div class="field">
-                {{ form.username.errors }}
                 {{ form.username.label_tag }}
                 {{ form.username }}
+                <div class="ui error message">{{ form.username.errors }}</div>
             </div>
             <div class="field">
-                {{ form.email.errors }}
                 {{ form.email.label_tag }}
                 {{ form.email }}
+                <div class="ui error message">{{ form.email.errors }}</div>
             </div>
             <div class="field">
-                {{ form.is_superuser.errors }}
                 {{ form.is_superuser.label_tag }}
                 {{ form.is_superuser }}
+                <div class="ui error message">{{ form.is_superuser.errors }}</div>
             </div>
             <button class="ui primary button" type="submit">Create</button>
         </form>
