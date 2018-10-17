@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'otree_manager.om.middleware.DemoMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -175,3 +176,5 @@ EMAIL_PORT = 25
 # Custom User Model
 AUTH_USER_MODEL = 'om.User'
 
+# Demo Mode
+DEMO = True

@@ -24,9 +24,7 @@ class User(AbstractUser):
     class Meta:
         app_label = 'om'
 
-
     username_validator = CustomUsernameValidator()
-
     username = models.CharField(
         _('username'),
         max_length=63,
