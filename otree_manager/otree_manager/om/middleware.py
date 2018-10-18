@@ -26,13 +26,8 @@ class DemoMiddleware:
 
     def __call__(self, request):
         # 'intercepting request before view'
-
-
         response = self.get_response(request)
-
         # 'intercepting after view'
-
-
         return response
 
 
