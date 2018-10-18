@@ -34,9 +34,9 @@ except NameError:
             to generate your secret key!' % SECRET_FILE)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.oforest.org']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.oforest.org', '.otree-manager.com']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 
 # Application definition
@@ -175,6 +175,3 @@ EMAIL_PORT = 25
 
 # Custom User Model
 AUTH_USER_MODEL = 'om.User'
-
-# Demo Mode
-DEMO = True
