@@ -19,7 +19,7 @@ urlpatterns = [
     path('user/delete/<int:user_id>', views.delete_user, name="delete_user"),
     path('user/edit/<int:user_id>', views.edit_user, name="edit_user"),
     path('user/edit/keyfile/', views.change_key_file, name='change_key_file'),
-    path('user/password/reset/', auth_views.PasswordResetView.as_view(template_name='om/user/password_reset.html'),
+    path('user/password/reset/', auth_views.PasswordResetView.as_view(template_name='om/user/password_reset.html', email_template_name='om/emails/password_reset_mail.html'),
          name='password_reset'),
     path('user/password/reset/done/',
          auth_views.PasswordResetDoneView.as_view(template_name='om/user/password_reset_done.html'),
