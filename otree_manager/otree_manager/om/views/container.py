@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
+from django.conf import settings
 
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -151,11 +152,13 @@ def detail(request, instance_id=None):
 
     plabel = ", ".join(inst.get_participant_labels())
 
-    # lurl = inst.get_lobby_url()
+    prefix = 'https' if request.is_secure() else 'http'
     lurl = reverse('lobby_overview', args=[inst.name])
 
+    lobby_url = "%s://%s%s" % (prefix, settings.DOKKU_DOMAIN, lurl)
+
     return render(request, 'om/container/detail.html',
-                  {'instance': inst, 'otree_participant_labels': plabel, 'lobby_url': lurl})
+                  {'instance': inst, 'otree_participant_labels': plabel, 'lobby_url': lobby_url})
 
 
 @login_required
