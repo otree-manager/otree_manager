@@ -33,8 +33,7 @@ except NameError:
             Exception('Please create a %s file with random characters \
             to generate your secret key!' % SECRET_FILE)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.oforest.org', '.otree-manager.com']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
@@ -54,7 +53,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'otree_manager.om.middleware.DemoMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -62,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'otree_manager.urls'
 
@@ -76,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'otree_manager.om.processors.settings'
             ],
         },
     },
@@ -175,3 +175,12 @@ EMAIL_PORT = 25
 
 # Custom User Model
 AUTH_USER_MODEL = 'om.User'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+# DEMO Mode
+DEMO = False
+
+if DEMO:
+    MIDDLEWARE.append('otree_manager.om.middleware.DemoMiddleware',)

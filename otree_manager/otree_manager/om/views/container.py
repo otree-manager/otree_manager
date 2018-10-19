@@ -149,16 +149,15 @@ def detail(request, instance_id=None):
         return HttpResponseRedirect(reverse('index'))
 
     inst.refresh_from_dokku(request.user.id)
-
     plabel = ", ".join(inst.get_participant_labels())
 
     prefix = 'https' if request.is_secure() else 'http'
     lurl = reverse('lobby_overview', args=[inst.name])
-
     lobby_url = "%s://%s%s" % (prefix, settings.DOKKU_DOMAIN, lurl)
+    app_url = "%s://%s.%s" %(prefix, inst.name, settings.DOKKU_DOMAIN)
 
     return render(request, 'om/container/detail.html',
-                  {'instance': inst, 'otree_participant_labels': plabel, 'lobby_url': lobby_url})
+                  {'instance': inst, 'otree_participant_labels': plabel, 'container_url': app_url, 'lobby_url': lobby_url})
 
 
 @login_required
