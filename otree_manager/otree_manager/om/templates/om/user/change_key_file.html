@@ -1,7 +1,7 @@
 {% extends 'om/base.html' %}
 {% load static %}
 {% block head %}
-    <title>Change Key File</title>
+    <title>Upload Key File</title>
 {% endblock %}
 
 {% block menu %}
@@ -12,28 +12,60 @@
 
 {% block content %}
     <div class="ui form error segment">
-        <h1>Change Key File</h1>
-        <p>Please upload your ssh public key file to use for deploying your oTree code.<br/>
-            Ask your Lab Manager for assistance if you are unsure about this.</br/>
-            Typically it is located at ~/.ssh/id_rsa.pub</p>
+        <h1>Instructions</h1>
+        <p>You need to associate your SSH public key with your account in order for oTree Manager to identify uploads correctly.<br/>
+           Please follow the instructions matching your operating system. Ask your Lab Manager for assistance if needed.</p>
 
-        <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-            <div class="ui error message">
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
-        <div class="field">
-            {{ form.public_key_file.errors }}
-            <div class="ui action file input">
-                <label for="id_public_key_file" id="filename">Select Public Key File</label>
-                <input name="public_key_file" required="" id="id_public_key_file" type="file">
-                <label for="id_public_key_file" class="ui icon button"><i class="attach icon"></i></label>
-            </div>
+        <div class="ui top attached tabular menu">
+            <a class="item" data-tab="win" id="win-tab"><i class="black windows link icon"></i>Windows</a>
+            <a class="item" data-tab="mac" id="mac-tab"><i class="black apple link icon"></i>macOS</a>
+            <a class="item" data-tab="linux" id="linux-tab"><i class="black linux link icon"></i>Linux</a>
         </div>
-        <button class="ui primary button" type="submit">Set SSH Public Key</button>
-    </form>
+        <div class="ui bottom attached tab segment" data-tab="win" id="win-instructions">
+            <p>The SSH key files are typically located at <span class="code">C:\Users\&lt;your_username&gt;\.ssh\</span>.<br>
+            <p>Please make sure to upload the <b>public</b> key file <span class="code">id_rsa.pub</span>.</p>
+            <p>If the directory or the files do not exist, you have to generate them first:<br>
+                Open Windows PowerShell and run <span class="code">ssh-keygen.exe</span>.<br>
+                Follow its instructions and proceed as described above once finished.</p>
+        </div>
+        <div class="ui bottom attached tab segment" data-tab="mac" id="mac-instructions">
+            <p>The SSH key files are typically located at <span class="code">/Users/&lt;your_username&gt;/.ssh/</span>.<br>
+                <em>The directory <span class="code">.ssh</span> is hidden by default. To show hidden files in Finder press </em><span class="code">command</span> + <span class="code">shift</span> + <span class="code">.</span></p>
+            <p>Please make sure to upload the <b>public</b> key file <span class="code">id_rsa.pub</span>.</p>
+            <p>If the directory or the files do not exist, you have to generate them first:<br>
+                While you are logged in, open a terminal and run <span class="code">ssh-keygen</span>.<br>
+                Follow its instructions and proceed as described above once finished.</p>
+        </div>
+        <div class="ui bottom attached tab segment" data-tab="linux" id="linux-instructions">
+            <p>The SSH key files are typically located at <span class="code">/home/&lt;your_username&gt;/.ssh/</span>.<br>
+            <em>The directory <span class="code">.ssh</span> is hidden by default. You might have to turn on 'show hidden files' in your file browser. The shortcuts are:<br>
+                KDE/Dolphin: press </em><span class="code">F8</span><br>
+                <em>Gnome/Nautilus: press </em><span class="code">ctrl</span> + <span class="code">h</span></p>
+            <p>Please make sure to upload the <b>public</b> key file <span class="code">id_rsa.pub</span>.</p>
+            <p>If the directory or the files do not exist, you have to generate them first:<br>
+                While you are logged in, open a terminal and run <span class="code">ssh-keygen</span>.<br>
+                Follow its instructions and proceed as described above once finished.</p>
+        </div>
+
+        <h2>Public Key File</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="ui error message">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            <div class="field">
+                {{ form.public_key_file.errors }}
+                <div class="ui action file input">
+                    <label for="id_public_key_file" id="filename">Select Public Key File</label>
+                    <input name="public_key_file" required="" id="id_public_key_file" type="file">
+                    <label for="id_public_key_file" class="ui icon button"><i class="attach icon"></i></label>
+                </div>
+            </div>
+            <p><em>Note: While you should never share the private key with anyone, the public key is safe to distribute.</em></p>
+            <button class="ui primary button" type="submit">Set SSH Public Key</button>
+        </form>
     </div>
 {% endblock %}
 
@@ -67,14 +99,42 @@
         .ui.action.file.input > label:last-child { 
             border-radius: 0 .28571429rem .28571429rem 0 !important; 
         }
+        .code {
+            background-color: #ededed;
+            font-family: "Courier New", Courier, monospace;
+            display: inline-block;
+            padding: 0px 3px 0px 3px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 12px;
+            font-style: normal;
+        }
+
     </style>
 {% endblock %}
 
 {% block scripts %}
+    <script type="text/javascript" src="{% static 'om/is.js' %}"></script>
     <script type="text/javascript">
         $('input:file', '.ui.action.input').on('change', function (e) {
             var name = e.target.files[0].name;
             $('#filename').html(name);
+        });
+        $('.menu .item').tab();
+
+        $(document).ready(function () {
+            if (is.windows()) {
+                $('#win-tab').addClass('active');
+                $('#win-instructions').addClass('active');
+            }
+            if (is.mac()) {
+                $('#mac-tab').addClass('active');
+                $('#mac-instructions').addClass('active');
+            }
+            if (is.linux()) {
+                $('#linux-tab').addClass('active');
+                $('#linux-instructions').addClass('active');
+            }
         });
     </script>
 {% endblock %}
