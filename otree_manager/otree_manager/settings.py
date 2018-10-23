@@ -35,7 +35,7 @@ except NameError:
 
 
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.oforest.org', '.otree-manager.com']
+ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 
 # Application definition
