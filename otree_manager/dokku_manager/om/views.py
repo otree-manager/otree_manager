@@ -373,3 +373,7 @@ def imprint(request):
 
 def privacy(request):
     return render(request, 'om/privacy.html', {})
+
+def about(request):
+    return render(request, 'om/about.html', {})
+
