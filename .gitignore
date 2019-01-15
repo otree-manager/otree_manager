@@ -1,6 +1,6 @@
 *.pyc
 *__pycache__
-keyfiles/*
+*/keyfiles/*
 tmp/*
 !*/.gitkeep
 venv/
@@ -17,3 +17,4 @@ keyfiles/*
 debian/
 *.idea
 *DS_Store*
+.env

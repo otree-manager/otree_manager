@@ -1,0 +1,65 @@
+{% extends 'om/base.html' %}
+{% load static %}
+{% block head %}
+    <title>Scale Dynos</title>
+{% endblock %}
+{% block menu %}
+    <div class="item header">
+        Scaling
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="ui form error segment">
+        <h1>Scale Processes</h1>
+        <p>Typically, one web process and one worker process are enough for laboratory experiments. If an experiment requires more capacity, you can scale up the number of processes here.</p>
+        <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="ui error message">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+            <div class="field">
+                {{ form.web_processes.errors }}
+                {{ form.web_processes.label_tag }}
+                <input name="web_processes" value="{{ form.web_processes.value }}" min="0" id="id_web_processes" required="" type="hidden">
+                <div class="ui labeled range" id="web-range"></div>
+            </div>
+
+            <div class="field">
+                {{ form.worker_processes.errors }}
+                {{ form.worker_processes.label_tag }}
+                <input name="worker_processes" value="{{ form.worker_processes.value }}" min="0" id="id_worker_processes" required="" type="hidden">
+                <div class="ui labeled range" id="worker-range"></div>
+            </div>
+        <button class="ui primary button" type="submit">Confirm</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'om/components/range.css' %}">
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="{% static 'om/components/range.js' %}"></script>
+    <script type="text/javascript">
+        $('#worker-range').range({
+            min: {{ MIN_WORKERS }},
+            max: {{ MAX_WORKERS }},
+            start: {{ form.worker_processes.value }}, // change to starting value
+            onChange: function(value) {
+              $('#id_worker_processes').val(value);
+            }
+         });
+        $('#web-range').range({
+            min: 0,
+            max: {{ MAX_WEB }},
+            start: {{ form.web_processes.value }}, // change to starting value
+            onChange: function(value) {
+              $('#id_web_processes').val(value);
+            }
+         });
+    </script>
+
+{% endblock %}
