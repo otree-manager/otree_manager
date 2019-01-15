@@ -16,6 +16,10 @@ import socket
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Secret key handling
+# If it is not set, we try to read it from file
+# If it cannot be read from file, generate one at random and store it in the secrets file. 
+# if it cannot be generated, raise an exception.
 try:
     SECRET_KEY
 except NameError:
@@ -39,7 +43,6 @@ ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS.append(os.environ.get('DJANGO_ALLOWED_HOST'))
 
 # Application definition
-
 INSTALLED_APPS = [
     'otree_manager.om.apps.OmConfig',
     'channels',
@@ -86,7 +89,6 @@ ASGI_APPLICATION = 'otree_manager.routing.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-
 DATABASES = {
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -124,7 +126,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'CET'
 USE_I18N = True
@@ -144,7 +145,6 @@ CHANNEL_LAYERS = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-
 STATIC_ROOT = os.path.join(BASE_DIR, '_static_root')
 STATIC_URL = '/static/'
 
@@ -156,7 +156,7 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_SSL_REDIRECT = False
 #SESSION_COOKIE_SECURE = True
 #CSRF_COOKIE_SECURE = True
-X_FRAME_OPTIONS = "DENY"
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # settings for the login / auth system
 LOGIN_URL = '/user/login/'
@@ -177,7 +177,7 @@ EMAIL_PORT = 25
 AUTH_USER_MODEL = 'om.User'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # DEMO Mode
 DEMO = False

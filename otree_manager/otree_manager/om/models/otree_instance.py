@@ -8,13 +8,16 @@ from .user import User
 
 import json
 
+"""Implements the oTree Instance object"""
 
+# make channel layer available 'globally'
 channel_layer = get_channel_layer()
 
 class OTreeInstance(models.Model):
     class Meta:
         app_label = 'om'
 
+    # oTree instances always have a name
     name = models.CharField(
         max_length=63,
         validators=[
@@ -24,13 +27,17 @@ class OTreeInstance(models.Model):
                 code='invalid')
         ]
     )
+    
+    # they have exactly owner, which is user object
     owned_by = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Experimenter")
 
+    # instance details, mostly read from dokku
     deployed = models.BooleanField(default=False)
     git_sha = models.CharField(max_length=200, blank=True)
     deploy_source = models.CharField(max_length=200, blank=True)
     app_dir = models.CharField(max_length=200, blank=True)
-
+    
+    # otree variables
     otree_admin_username = models.CharField(max_length=200, blank=True)
     otree_admin_password = models.CharField(max_length=200, blank=True)
     otree_auth_level = models.CharField(max_length=200, blank=True)
@@ -38,6 +45,7 @@ class OTreeInstance(models.Model):
     otree_room_name = models.CharField(max_length=200, blank=True)
     otree_participant_labels = models.TextField(default="[]")
 
+    # scaling 
     web_processes = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),
                                                                  MaxValueValidator(settings.MAX_WEB)], default=1,
                                                      verbose_name="Web processes")
@@ -50,20 +58,26 @@ class OTreeInstance(models.Model):
         return self.name
 
     def set_participant_labels(self, participant_label_list):
+        """Stores participant labels as json encoded string"""
         self.otree_participant_labels = json.dumps(participant_label_list)
         self.save()
 
     def get_participant_labels(self):
+        """Returns list of participant labels"""
         return json.loads(self.otree_participant_labels)
 
     def git_url(self):
+        """Returns GIT repository URL"""
         git_url = "dokku@%s:%s" % (settings.DOKKU_DOMAIN, self.name)
         return git_url
 
     def participant_label_valid(self, participant_label):
+        """Used to check if a participant label is defined for the instance"""
         return participant_label in self.get_participant_labels()
 
     def refresh_from_dokku(self, user_id):
+        """Trigger background process to update instance details from dokku app report"""
+        
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {
@@ -74,6 +88,8 @@ class OTreeInstance(models.Model):
         )
 
     def scale_container(self, user_id=-1):
+        """Trigger background process to set web and worker processes"""
+
         processes_dict = {
             'web': str(self.web_processes),
             'worker': str(self.worker_processes),
@@ -89,6 +105,7 @@ class OTreeInstance(models.Model):
         )
 
     def create_container(self, user_id):
+        """Triggers background process to create instance container"""
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {
@@ -97,6 +114,7 @@ class OTreeInstance(models.Model):
                 "instance_name": self.name
             },
         )
+        # after creation, make sure to add GIT permissions for the owner (also in worker task)
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {
@@ -109,6 +127,7 @@ class OTreeInstance(models.Model):
         )
 
     def restart_container(self, user_id):
+        """Triggers background process to restart the instance"""
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {
@@ -119,6 +138,7 @@ class OTreeInstance(models.Model):
         )
 
     def destroy_dokku_app(self, user_id, delete_self=True):
+        """Triggers background process to destroy the instance"""
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {
@@ -131,6 +151,7 @@ class OTreeInstance(models.Model):
             num_delete, _ = self.delete()
 
     def set_default_environment(self, user_id=-1):
+        """Sets default environment variables"""
         self.otree_production = 1
         self.otree_admin_username = "admin"
         self.otree_admin_password = User.objects.make_random_password()
@@ -139,15 +160,14 @@ class OTreeInstance(models.Model):
         self.set_environment(user_id)
 
     def set_environment(self, user_id=-1):
-        print('set env')
+        """Triggers background process to update environment variables on the instance"""
+        
         env_vars_dict = {
             'OTREE_PRODUCTION': self.otree_production,
             'OTREE_ADMIN_USERNAME': self.otree_admin_username,
             'OTREE_ADMIN_PASSWORD': self.otree_admin_password,
             'OTREE_AUTH_LEVEL': self.otree_auth_level
         }
-
-        print(env_vars_dict)
 
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
@@ -161,10 +181,11 @@ class OTreeInstance(models.Model):
 
         # this is dangerous.
         # changing the admin password means resetting the whole database
-        # this should be adressed or removed.
+        # this should be addressed or removed.
         self.reset_database(user_id)
 
     def reset_database(self, user_id):
+        """Triggers background process to reset the database"""
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {

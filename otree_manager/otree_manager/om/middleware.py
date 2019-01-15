@@ -1,8 +1,13 @@
 from .views import FeatureDisabled
 
+"""Implementation of Demo mode middleware to restrict access to certain features"""
+
 class DemoMiddleware:
+    """Middle ware used to restrict access to certain functions in demo mode"""
     def __init__(self, get_response):
         self.get_response = get_response
+        
+        # define views which are disabled completely
         self.disabled_views = [
             'PasswordChangeDoneView',
             'PasswordResetDoneView',
@@ -11,6 +16,7 @@ class DemoMiddleware:
             'delete_user',
             'delete',
         ]
+        # define views which reply to GET, but not to POST (typically changing something)
         self.disabled_post_views = [
             'PasswordChangeView',
             'PasswordResetView',
@@ -25,15 +31,17 @@ class DemoMiddleware:
         ]
 
     def __call__(self, request):
-        # 'intercepting request before view'
         response = self.get_response(request)
-        # 'intercepting after view'
         return response
 
 
     def process_view(self, request, view_func, view_args, view_kwargs):
+        """Process calls to views according to demo restrictions"""
+        
         print('disabled view: %s, method: %s' % (view_func.__name__, request.method))
+        
         # disable some views completely (i.e. for all request methods)
+        # return the Feature Disabled view instead
         if view_func.__name__ in self.disabled_views:
             return FeatureDisabled.as_view()(request)
 

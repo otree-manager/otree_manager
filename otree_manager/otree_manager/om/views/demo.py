@@ -1,9 +1,9 @@
-from django.http import HttpResponse
-#from django.views.generic.base import TemplateView
 from django.views import View
 from django.shortcuts import render
 
 class FeatureDisabled(View):
+    """This view is exclusively called from the demo middleware"""
+    # all requests are served the feature disabled template.
     template_name = "om/demo/FeatureDisabled.html"
 
     def get(self, request, *args, **kwargs):

@@ -3,6 +3,8 @@ from channels.auth import AuthMiddlewareStack
 
 import otree_manager.om.routing
 
+
+# There are two routers. One for websocket connections, one for dokku background tasks
 application = ProtocolTypeRouter({
     'websocket': AuthMiddlewareStack(
         URLRouter(
