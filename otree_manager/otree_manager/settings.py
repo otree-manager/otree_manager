@@ -149,7 +149,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, '_static_root')
 STATIC_URL = '/static/'
 
 
-
 # Security
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True

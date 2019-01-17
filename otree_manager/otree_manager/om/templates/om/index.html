@@ -12,7 +12,7 @@
 
 {% block content %}
     {% if not instances and not request.user.is_superuser %}
-        <p align="center">You have not been assigend any oTree containers.<br/>Ask your Lab Manager to create one for you.</p>
+        <p align="center">You have not been assigned any oTree containers.<br/>Ask your Lab Manager to create one for you.</p>
     {% endif %}
     <div class="ui centered stackable grid">
         {% for instance in instances %}
