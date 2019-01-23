@@ -5,9 +5,8 @@
     <script type='text/javascript'>
         String.prototype.capitalize = function() {
             return this.charAt(0).toUpperCase() + this.slice(1);
-        }
-        // websockets
-        
+        };
+
         function notify(result, message) {
             console.log(result, message);
             
@@ -40,13 +39,12 @@
                 $("#"+notification_id).transition('fade');
             }, 10000);
         }
-
-
-        const wsBridge = new channels.WebSocketBridge();
-        wsBridge.connect('/ws/');
-
-        wsBridge.listen(function(data, stream) {
-            // console.log(data, stream);
+    </script>
+    <script type="text/javascript">
+        // websocket replacement for websocket bridge from django channels
+        var wsBridge = new WebSocket('ws://' + window.location.host + '/ws/');
+        wsBridge.onmessage = function (e) {
+            var data = JSON.parse(e.data);
             if (data['kind'] == 'notification') {
                 notify(data['result'], data['message']);
             } else {
@@ -54,10 +52,14 @@
                     handle_ws_data(data, stream);
                 }
             }
-        });
+        };
 
-        wsBridge.socket.addEventListener('open', function() {
-            console.log('Connected to WebSocket');
-        });
+        wsBridge.onopen = function(e) {
+            console.log('Connected to oTree Manager')
+        };
+
+        wsBridge.onclose = function(e) {
+            console.error('Websocket closed unexpectedly');
+        };
     </script>
 {% endblock ws%}
