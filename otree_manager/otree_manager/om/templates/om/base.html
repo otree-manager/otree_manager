@@ -59,7 +59,7 @@
                     <div class="ui dropdown icon item">
                         <i class="orange wrench icon"></i>
                         <div class="menu">
-                            <a class="item" href="{%url 'new_app' %}">
+                            <a class="item" href="{% url 'new_app' %}">
                                 <i class="hdd icon"></i>
                                 Add Container
                             </a>
@@ -71,7 +71,7 @@
                                 Edit Users
                             </a>
 
-                            <a class="item" href="{%url 'new_user' %}">
+                            <a class="item" href="{% url 'new_user' %}">
                                 <i class="user plus icon"></i>
                                 Add User
                             </a>
@@ -82,19 +82,19 @@
                 <div class="ui dropdown icon item" id="user_navigation">
                     <i class="user icon"></i>
                     <div class="menu">
-                        <a class="item" href="{%url 'password_change' %}">
+                        <a class="item" href="{% url 'password_change' %}">
                             <i class="edit icon"></i>
                             Change Password
                         </a>
 
-                        <a class="item" href="{%url 'change_key_file' %}">
+                        <a class="item" href="{% url 'change_key_file' %}">
                             <i class="id card icon"></i>
                             Change SSH Key
                         </a>
 
                         <div class="divider"></div>
 
-                        <a class="item" href="{%url 'logout' %}">
+                        <a class="item" href="{% url 'logout' %}">
                             <i class="red sign out alternate icon"></i>
                             Logout
                         </a>
