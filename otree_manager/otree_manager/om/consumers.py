@@ -77,10 +77,12 @@ class OTree_Manager_Tasks(SyncConsumer):
         
         print('received scale app task')
         cmd = ['dokku', '--quiet', 'ps:scale', event["instance_name"]]
+        print(cmd)
 
         # get command friendly foo=bar pairs from dictionary
         cmd.append(command_friendly_kv_pair(event['var_dict']))
-
+        print(cmd)
+        
         proc = subprocess.run(cmd)
         if proc.returncode != 0:
             # notify user of error then return
