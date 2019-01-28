@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
 ]
 
 MIDDLEWARE = [
@@ -180,6 +182,9 @@ DEBUG = False
 
 # DEMO Mode
 DEMO = False
+
+# Flat Pages
+SITE_ID = 1
 
 if DEMO:
     MIDDLEWARE.append('otree_manager.om.middleware.DemoMiddleware',)

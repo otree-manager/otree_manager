@@ -1,13 +1,14 @@
 from django.urls import path, re_path
 from django.contrib.auth import views as auth_views
+from django.contrib.flatpages import views as fp_views
 from . import views
 
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('imprint/', views.imprint, name='imprint'),
-    path('privacy/', views.privacy, name='privacy'),
-    path('about/', views.about, name='about'),
+    path('imprint/', fp_views.flatpage, {'url': '/imprint/'}, name='imprint'),
+    path('privacy/', fp_views.flatpage, {'url': '/privacy/'}, name='privacy'),
+    path('about/', fp_views.flatpage, {'url': '/about/'}, name='about'),
     path('lobby/<str:instance_name>/', views.lobby_overview, name="lobby_overview"),
     path('lobby/<str:instance_name>/<str:participant_label>/', views.lobby, name="lobby"),
     path('lobby/download/<str:instance_name>/<str:os>/', views.download_shortcuts, name="download_shortcuts"),
