@@ -77,11 +77,9 @@ class OTree_Manager_Tasks(SyncConsumer):
         
         print('received scale app task')
         cmd = ['dokku', '--quiet', 'ps:scale', event["instance_name"]]
-        print(cmd)
 
         # get command friendly foo=bar pairs from dictionary
-        cmd.append(command_friendly_kv_pair(event['var_dict']))
-        print(cmd)
+        cmd.extend(command_friendly_kv_pair(event['var_dict']))
         
         proc = subprocess.run(cmd)
         if proc.returncode != 0:
@@ -231,7 +229,7 @@ class OTree_Manager_Tasks(SyncConsumer):
         cmd = ['dokku', '--quiet', 'config:set', event["instance_name"]]
 
         # get command friendly foo=bar pairs from dictionary
-        cmd.append(command_friendly_kv_pair(event['var_dict']))
+        cmd.extend(command_friendly_kv_pair(event['var_dict']))
 
         proc = subprocess.run(cmd, stdout=subprocess.PIPE)
 

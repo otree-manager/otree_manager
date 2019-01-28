@@ -27,5 +27,5 @@ def command_friendly_kv_pair(dict):
     # subprocess.run expects parameters to be in the foo=bar format. We build this format here and return a list
     output = []
     for key, value in dict.items():
-        output.append('%s=%s ' % (key, value))
+        output.append('%s=%s' % (key, value))
     return output
