@@ -6,6 +6,7 @@ from .utils import PLUGINS, command_friendly_kv_pair
 import json
 import time
 import subprocess
+import logging
 
 """
 This file implements the two consumer types. One is for websockets, the other for dokku background tasks.
@@ -263,8 +264,12 @@ class OTree_Manager_Tasks(SyncConsumer):
     def user_add_key(self, event):
         """Adds an ssh key to a user object"""
 
-        print('received user add key event')
-        proc = subprocess.run(['sudo', 'dokku', 'ssh-keys:add', event['user_name'], event['key_path']])
+        logging.warning('received user add key event')
+
+        # there seems to be strange issue with dokku's ssh-keys:add command. It hangs indefinitely if shell is not equal to True
+        # shell=True is not nice, though. have to fix this at some point
+        proc = subprocess.run(['dokku', 'ssh-keys:add', event['user_name'], event['key_path']], shell=True)
+
         if proc.returncode != 0:
             # notify user of error then return
             self._notify_user(event, "add_key", proc.returncode)
@@ -276,8 +281,8 @@ class OTree_Manager_Tasks(SyncConsumer):
     def user_remove_key(self, event):
         """Removes an ssh key from a user object"""
 
-        print('received user remove key event')
-        proc = subprocess.run(['sudo', 'dokku', 'ssh-keys:remove', event['user_name']])
+        logging.warning('received user remove key event')
+        proc = subprocess.run(['dokku', 'ssh-keys:remove', event['user_name']], shell=True)
 
         if proc.returncode != 0:
             # notify user of error then return
@@ -291,11 +296,10 @@ class OTree_Manager_Tasks(SyncConsumer):
         """Adds git permissions to a user object"""
         
         print('received user add acl event')
-        proc = subprocess.run(['sudo', 'dokku', 'acl:add', event["instance_name"], event['user_name']])
+        proc = subprocess.run(['dokku', 'acl:add', event["instance_name"], event['user_name']])
         if proc.returncode != 0:
             # notify user of error then return
             self._notify_user(event, "add_acl", proc.returncode)
-            return False
 
         # success
         self._notify_user(event, "add_acl", proc.returncode)

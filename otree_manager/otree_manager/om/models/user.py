@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from otree_manager.om.utils import path_and_filename
-
+import logging
 """Implements user object and helpers"""
 
 # make channel layer available 'globally'
@@ -70,7 +70,6 @@ class User(AbstractUser):
         """Triggers background procress to set public key file (removes old if one is set)"""
         if self.public_key_set:
             self.remove_public_key()
-
         async_to_sync(channel_layer.send)(
             "otree_manager_tasks",
             {

@@ -45,7 +45,7 @@ class ChangeRoomForm(forms.ModelForm):
     def clean_labels_file(self):
         """Checks if labels file appears to be suitable"""
         participant_label_file = self.cleaned_data.get('labels_file', False)
-        print(participant_label_file)
+        # print(participant_label_file)
 
         if participant_label_file.size > 1024:
             raise forms.ValidationError(error_messages['file_size'], code="invalid file")
@@ -108,11 +108,11 @@ class ChangeKeyForm(forms.ModelForm):
         if os.path.isfile(file_path):
             os.remove(file_path)
 
+
         # check outcome
         if proc.returncode != 0:
             # notify user of error then return
             raise forms.ValidationError(error_messages['invalid_file'], code="invalid file")
-
         return public_key_file
 
     def save(self, commit=True):
