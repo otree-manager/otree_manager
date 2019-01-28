@@ -92,7 +92,7 @@ class OTree_Manager_Tasks(SyncConsumer):
 
     def update_app_report(self, event):
         """Update app details based on dokku information"""
-        proc = subprocess.run(['dokku', '--quiet', 'apps:report', event["instance_name"]],
+        proc = subprocess.run(['dokku', 'apps:report', event["instance_name"]],
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         report_dict = {
@@ -104,13 +104,11 @@ class OTree_Manager_Tasks(SyncConsumer):
 
         # successful reports go to stdout, while "not deployed" is considered an error and goes to stderr
         # read both into the same variable so there is no need to differentiate below
-        if proc.returncode == 0:
-            lines = proc.stdout.decode('utf-8').split('\n')[:-1]
-        else:
-            lines = proc.stderr.decode('utf-8').split('\n')
+        lines = proc.stdout.decode('utf-8').split('\n')[:-1]
+        lines += proc.stderr.decode('utf-8').split('\n')[:-1]
 
         # extract useful data from lines
-        if lines[0].strip() != "not deployed":
+        if lines[1].strip() != "not deployed":
             report_dict["deployed"] = True
             for line in lines:
                 split = [text.strip() for text in line.split(':')]
