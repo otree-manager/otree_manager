@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI 2.4.2 - Dropdown
+ * # Semantic UI 2.3.2 - Dropdown
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -605,6 +605,7 @@ $.fn.dropdown = function(parameters) {
             else {
               if(settings.on == 'click') {
                 $module
+                  .on('click' + eventNamespace, selector.icon, module.event.icon.click)
                   .on('click' + eventNamespace, module.event.test.toggle)
                 ;
               }
@@ -620,7 +621,6 @@ $.fn.dropdown = function(parameters) {
                 ;
               }
               $module
-                .on('click' + eventNamespace, selector.icon, module.event.icon.click)
                 .on('mousedown' + eventNamespace, module.event.mousedown)
                 .on('mouseup'   + eventNamespace, module.event.mouseup)
                 .on('focus'     + eventNamespace, module.event.focus)
@@ -1019,12 +1019,7 @@ $.fn.dropdown = function(parameters) {
           },
           icon: {
             click: function(event) {
-              if($icon.hasClass(className.clear)) {
-                module.clear();
-              }
-              else if (module.can.click()) {
-                module.toggle();
-              }
+              module.toggle();
             }
           },
           text: {
@@ -1651,7 +1646,7 @@ $.fn.dropdown = function(parameters) {
           },
 
           hide: function(text, value, element) {
-            module.set.value(value, text, $(element));
+            module.set.value(value, text);
             module.hideAndClear();
           }
 
@@ -2486,15 +2481,6 @@ $.fn.dropdown = function(parameters) {
                 $module.data(metadata.value, stringValue);
               }
             }
-            if(module.is.single() && settings.clearable) {
-              // treat undefined or '' as empty
-              if(!escapedValue) {
-                module.remove.clearable();
-              }
-              else {
-                module.set.clearable();
-              }
-            }
             if(settings.fireOnInit === false && module.is.initialLoad()) {
               module.verbose('No callback on initial load', settings.onChange);
             }
@@ -2590,10 +2576,7 @@ $.fn.dropdown = function(parameters) {
                 }
               })
             ;
-          },
-          clearable: function() {
-            $icon.addClass(className.clear);
-          },
+          }
         },
 
         add: {
@@ -2791,7 +2774,7 @@ $.fn.dropdown = function(parameters) {
             }
             module.set.value(newValue, addedValue, addedText, $selectedItem);
             module.check.maxSelections();
-          },
+          }
         },
 
         remove: {
@@ -3016,9 +2999,6 @@ $.fn.dropdown = function(parameters) {
                 .removeAttr('tabindex')
               ;
             }
-          },
-          clearable: function() {
-            $icon.removeClass(className.clear);
           }
         },
 
@@ -3706,8 +3686,6 @@ $.fn.dropdown.settings = {
 
   values                 : false,      // specify values to use for dropdown
 
-  clearable              : false,      // whether the value of the dropdown can be cleared
-
   apiSettings            : false,
   selectOnKeydown        : true,       // Whether selection should occur automatically when keyboard shortcuts used
   minCharacters          : 0,          // Minimum characters required to trigger API call
@@ -3860,7 +3838,6 @@ $.fn.dropdown.settings = {
     active      : 'active',
     addition    : 'addition',
     animating   : 'animating',
-    clear       : 'clear',
     disabled    : 'disabled',
     empty       : 'empty',
     dropdown    : 'ui dropdown',
