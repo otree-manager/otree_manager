@@ -6,9 +6,11 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('imprint/', fp_views.flatpage, {'url': '/imprint/'}, name='imprint'),
-    path('privacy/', fp_views.flatpage, {'url': '/privacy/'}, name='privacy'),
-    path('about/', fp_views.flatpage, {'url': '/about/'}, name='about'),
+    path('legal/imprint/', fp_views.flatpage, {'url': '/legal/imprint/'}, name='imprint'),
+    path('legal/imprint/edit/', views.imprint_edit, name='edit_imprint'),
+    path('legal/privacy/', fp_views.flatpage, {'url': '/legal/privacy/'}, name='privacy'),
+    path('legal/privacy/edit/', views.privacy_edit, name='edit_privacy'),
+    path('about/', views.about, name='about'),
     path('lobby/<str:instance_name>/', views.lobby_overview, name="lobby_overview"),
     path('lobby/<str:instance_name>/<str:participant_label>/', views.lobby, name="lobby"),
     path('lobby/download/<str:instance_name>/<str:os>/', views.download_shortcuts, name="download_shortcuts"),

@@ -27,7 +27,9 @@ class DemoMiddleware:
             'change_otree_password',
             'reset_otree_password',
             'scale_app',
-            'change_otree_room'
+            'change_otree_room',
+            'edit_privacy',
+            'edit_imprint',
         ]
 
     def __call__(self, request):

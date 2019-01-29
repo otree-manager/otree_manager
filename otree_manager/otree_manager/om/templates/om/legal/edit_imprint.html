@@ -1,0 +1,47 @@
+{% extends 'om/base.html' %}
+{% load static %}
+{% block head %}
+    <title>Edit Imprint</title>
+{% endblock %}
+{% block menu %}
+    <div class="item header">
+        Imprint
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="ui form error segment">
+        <h1>Edit Imprint Page</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="ui error message">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            <div class="field">
+                {{ form.title.errors }}
+                {{ form.title.label_tag }}
+                {{ form.title }}
+            </div>
+            <div class="field">
+                {{ form.content.errors }}
+                {{ form.content.label_tag }}
+                {{ form.content }}
+            </div>
+
+            <input name="url" value="{{ form.url.value }}" id="id_url" maxlength="100" type="hidden">
+            <input name="enable_comments" id="id_enable_comments" type="hidden" value="{{ form.enable_comments.value }}">
+            <input name="registration_required" id="id_registration_required" type="hidden" value="{{ form.registration_required.value }}">
+            <input name="sites" id="id_sites" type='hidden' value='{{ form.sites.value.0 }}'>
+            
+            {{ form.sites.errors }}
+            {{ form.url.errors }}
+            {{ form.registration_required.errors }}
+            {{ form.comments_enabled.errors }}
+
+            <button class="ui primary button" type="submit">Save</button> 
+        </form>
+    </div>
+
+{% endblock %}

@@ -23,15 +23,6 @@ def index(request):
     context = {'instances': show_instances, 'user': request.user}
     return render(request, 'om/index.html', context)
 
-
-def imprint(request):
-    """Imprint page"""
-    return render(request, 'om/imprint.html', {})
-
-def privacy(request):
-    """Privacy Statement page"""
-    return render(request, 'om/privacy.html', {})
-
 def about(request):
     """About page"""
     return render(request, 'om/about.html', {})
