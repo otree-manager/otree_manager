@@ -28,8 +28,8 @@ class DemoMiddleware:
             'reset_otree_password',
             'scale_app',
             'change_otree_room',
-            'edit_privacy',
-            'edit_imprint',
+            'privacy_edit',
+            'imprint_edit',
         ]
 
     def __call__(self, request):
