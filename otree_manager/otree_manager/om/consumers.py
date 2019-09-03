@@ -265,10 +265,7 @@ class OTree_Manager_Tasks(SyncConsumer):
         """Adds an ssh key to a user object"""
 
         logging.warning('received user add key event')
-
-        # there seems to be strange issue with dokku's ssh-keys:add command. It hangs indefinitely if shell is not equal to True
-        # shell=True is not nice, though. have to fix this at some point
-        proc = subprocess.run(['dokku', 'ssh-keys:add', event['user_name'], event['key_path']], shell=True)
+        proc = subprocess.run(['dokku', 'ssh-keys:add', event['user_name'], event['key_path']])
 
         if proc.returncode != 0:
             # notify user of error then return
@@ -282,7 +279,7 @@ class OTree_Manager_Tasks(SyncConsumer):
         """Removes an ssh key from a user object"""
 
         logging.warning('received user remove key event')
-        proc = subprocess.run(['dokku', 'ssh-keys:remove', event['user_name']], shell=True)
+        proc = subprocess.run(['dokku', 'ssh-keys:remove', event['user_name']])
 
         if proc.returncode != 0:
             # notify user of error then return
