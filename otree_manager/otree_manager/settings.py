@@ -162,7 +162,7 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 # settings for the login / auth system
 LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
-DOKKU_DOMAIN = socket.gethostname()
+DOKKU_DOMAIN = os.environ.get('DOMAIN')
 DOKKU_BASE = "/home/dokku"
 
 # scaling
