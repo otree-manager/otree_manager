@@ -1,5 +1,5 @@
 setuptools
-Django==2.2.5
+Django==2.2.13
 channels-redis==2.4.0
 daphne==2.3.0
 psycopg2-binary==2.8.3
