@@ -4,6 +4,6 @@ This is oTree Manager. oTree Manager is a software package to create and manage 
 
 Read more on <http://docs.otree-manager.com>
 
-Note: This software is still under active development. As such, things can and will break (or are broken already). Currently, there are no automated tests. These will follow.
+I have stopped developping oTree Manager. Using subdomains and wild-card SSL certificates proved complicated in University IT systems. Attempts to proxy domain sub-paths (example.com/otree1/) to containers have failed due to some hard-coded oTree url routing.
 
-You are free to contribute by reviewing features, writing tests, or outright contributing new features. 
+The repository will remain read-only.
